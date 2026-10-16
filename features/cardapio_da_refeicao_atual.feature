@@ -1,5 +1,5 @@
 # language: pt
-# Issue #10 - MVP
+# Issue #10 - extra
 # Exemplos de segunda-feira extraídos de cardapio.json: complementos no café
 # da manhã e pratos principais no almoço e no jantar.
 # A refeição em atendimento é uma condição; a política de horários está fora deste escopo.
