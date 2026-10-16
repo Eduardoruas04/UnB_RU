@@ -2,8 +2,10 @@
 # Issue #7 - Extra
 # REGRAS ASSUMIDAS (ajustar com o grupo): cada registro mostra data/hora e
 # matrícula do aluno; a lista aparece do acesso mais recente para o mais
-# antigo; só entram acessos efetivamente registrados na catraca selecionada.
+# antigo; só entram acessos efetivamente registrados na catraca selecionada;
+# trocar de catraca atualiza a lista exibida.
 
+@extra
 Funcionalidade: Histórico local da catraca
   Como funcionário
   Quero visualizar na aplicação de controle o histórico de todos os acessos registrados apenas na catraca que estou gerenciando no momento
@@ -34,6 +36,21 @@ Funcionalidade: Histórico local da catraca
     E eu abro o histórico local
     Então o acesso das 12:30 deve aparecer antes do acesso das 12:00
 
+  Cenário: Trocar de catraca atualiza o histórico exibido (feliz)
+    Dado que a catraca "CAT-01" registrou o acesso do aluno "190012345"
+    E a catraca "CAT-02" registrou o acesso do aluno "190099999"
+    E eu estou vendo o histórico local da catraca "CAT-01"
+    Quando eu seleciono a catraca "CAT-02" na aplicação de controle
+    Então eu devo ver o acesso do aluno "190099999"
+    E eu não devo ver o acesso do aluno "190012345"
+
+  Cenário: Novo acesso aparece no histórico (feliz)
+    Dado que a catraca "CAT-01" ainda não registrou nenhum acesso
+    E eu estou vendo o histórico local da catraca "CAT-01"
+    Quando o aluno "190012345" passa pela catraca "CAT-01"
+    E eu atualizo o histórico local
+    Então eu devo ver o acesso do aluno "190012345" no topo da lista
+
   Cenário: Catraca sem nenhum acesso registrado (triste)
     Dado que a catraca "CAT-01" ainda não registrou nenhum acesso
     Quando eu seleciono a catraca "CAT-01" na aplicação de controle
@@ -43,6 +60,11 @@ Funcionalidade: Histórico local da catraca
   Cenário: Abrir o histórico sem selecionar uma catraca (triste)
     Quando eu abro o histórico local sem selecionar uma catraca
     Então eu devo ver a mensagem "Selecione uma catraca para ver o histórico"
+
+  Cenário: Abrir o histórico de uma catraca que foi removida (triste)
+    Dado que a catraca "CAT-02" foi removida
+    Quando eu tento abrir o histórico local da catraca "CAT-02"
+    Então eu devo ver a mensagem "Catraca não encontrada"
 
   Cenário: Acessar o histórico sem estar autenticado (triste)
     Dado que eu não estou autenticado
