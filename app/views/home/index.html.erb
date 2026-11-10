@@ -1,0 +1,82 @@
+<div style="max-width: 900px; margin: 30px auto; font-family: system-ui, -apple-system, sans-serif;">
+  <div style="background: #004b23; color: white; padding: 20px; border-radius: 8px; text-align: center;">
+    <h1>UnB RU — Central de Testes (Sprint 2)</h1>
+    <p>Ambiente integrado de desenvolvimento do Grupo 11</p>
+  </div>
+
+  <% if flash[:notice] %>
+    <div style="background: #d4edda; color: #155724; padding: 12px; margin: 20px 0; border-radius: 6px; border: 1px solid #c3e6cb;">
+      <%= flash[:notice] %>
+    </div>
+  <% end %>
+
+  <!-- BARRA DE STATUS DE SESSÃO -->
+  <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 8px; margin: 20px 0;">
+    <h3>Estado Atual da Sessão:</h3>
+    <% if logged_in? %>
+      <p>
+        Logado como: <strong><%= current_user.nome %></strong>
+        (Matrícula: <code><%= current_user.matricula %></code> | Perfil: <strong><%= current_user.papel.upcase %></strong>)
+        <% if current_user.carteira %>
+          | Saldo: <strong>R$ <%= sprintf("%.2f", current_user.carteira.saldo_centavos / 100.0) %></strong>
+        <% end %>
+      </p>
+      <%= button_to "Encerrar Sessão (Logout)", dev_logout_path, method: :delete, style: "background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;" %>
+    <% else %>
+      <p style="color: #6c757d;">Nenhum usuário logado no momento.</p>
+    <% end %>
+
+    <hr style="margin: 15px 0; border: 0; border-top: 1px solid #dee2e6;">
+
+    <h4>Simular Login Rápido (1 Clique):</h4>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <% @usuarios.each do |usuario| %>
+        <% rotulo = if usuario.papel == "estudante" %>
+          <% saldo = usuario.carteira ? sprintf("%.2f", usuario.carteira.saldo_centavos / 100.0) : "0.00" %>
+          <% "👤 #{usuario.nome} (Saldo: R$ #{saldo})" %>
+        <% elsif usuario.papel == "funcionario" %>
+          <% "👔 #{usuario.nome} (Operador)" %>
+        <% else %>
+          <% "🔑 #{usuario.nome}" %>
+        <% end %>
+        <%= button_to rotulo, dev_login_path(usuario_id: usuario.id), method: :post, style: "background: #007bff; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer;" %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- LINKS DAS FUNCIONALIDADES DE CADA INTEGRANTE -->
+  <h3>Painel de Acesso das Features:</h3>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px;">
+
+    <div style="border: 1px solid #ced4da; padding: 15px; border-radius: 6px;">
+      <h4>👤 Eduardo (Issues #1 e #15)</h4>
+      <p><a href="/usuarios/new">Cadastrar Usuário (#1)</a></p>
+      <p><a href="/sorteios">Painel FastPass (#15)</a></p>
+    </div>
+
+    <div style="border: 1px solid #ced4da; padding: 15px; border-radius: 6px;">
+      <h4>💳 Pablo (Issues #2 e #11)</h4>
+      <p><a href="/recargas/new">Recarga de Saldo (#2)</a></p>
+      <p><a href="/extrato">Extrato e Baixar PDF (#11)</a></p>
+    </div>
+
+    <div style="border: 1px solid #ced4da; padding: 15px; border-radius: 6px;">
+      <h4>🔐 Hagatta (Issues #4 e Bônus)</h4>
+      <p><a href="/login">Login Oficial (#4)</a></p>
+      <p><a href="/avaliacoes/new">Avaliar Refeição (Bônus)</a></p>
+    </div>
+
+    <div style="border: 1px solid #ced4da; padding: 15px; border-radius: 6px;">
+      <h4>🎟️ Luiz Felipe (Issues #6 e #10)</h4>
+      <p><a href="/catraca/operacao">Simulador da Catraca (#6)</a></p>
+      <p><a href="/cardapio">Cardápio do Almoço/Jantar (#10)</a></p>
+    </div>
+
+    <div style="border: 1px solid #ced4da; padding: 15px; border-radius: 6px;">
+      <h4>🏢 Victor (Issues #7 e #8)</h4>
+      <p><a href="/admin/restaurantes">Painel Admin RU (#8)</a></p>
+      <p><a href="/catraca/historico">Histórico Local Catraca (#7)</a></p>
+    </div>
+
+  </div>
+</div>
