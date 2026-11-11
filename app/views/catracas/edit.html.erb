@@ -1,0 +1,12 @@
+<h1>Editar catraca</h1>
+<%= form_with model: @catraca do |f| %>
+  <%= render "restaurantes/erros", registro: @catraca %>
+  <%= f.label :codigo_identificador, "Identificador da catraca" %>
+  <%= f.text_field :codigo_identificador %>
+  <%= f.label :restaurante_id, "Restaurante" %>
+  <%= f.collection_select :restaurante_id, @restaurantes, :id, :nome, include_blank: "Selecione" %>
+  <%= f.label :status, "Status" %>
+  <%= f.select :status, %w[ativa manutencao inativa] %>
+  <%= f.submit "Atualizar catraca" %>
+<% end %>
+<%= link_to "Voltar", restaurantes_path %>

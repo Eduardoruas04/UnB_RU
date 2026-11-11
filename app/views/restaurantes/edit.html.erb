@@ -1,0 +1,10 @@
+<h1>Editar restaurante</h1>
+<%= form_with model: @restaurante do |f| %>
+  <%= render "restaurantes/erros", registro: @restaurante %>
+  <%= f.label :nome, "Nome do restaurante" %>
+  <%= f.text_field :nome %>
+  <%= f.label :campus, "Campus" %>
+  <%= f.text_field :campus %>
+  <%= f.submit "Atualizar restaurante" %>
+<% end %>
+<%= link_to "Voltar", restaurantes_path %>

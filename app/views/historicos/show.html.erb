@@ -1,0 +1,43 @@
+<h1>Histórico local da catraca</h1>
+
+<%= form_with url: historico_local_path, method: :get do |f| %>
+  <%= f.label :catraca_id, "Catraca" %>
+  <%= f.select :catraca_id,
+        @catracas.map { |c| ["#{c.codigo_identificador} - #{c.restaurante&.nome}", c.id] },
+        { include_blank: "Selecione", selected: @catraca&.id } %>
+  <%= f.submit "Selecionar catraca" %>
+<% end %>
+
+<% if @catraca %>
+  <h2>Catraca <%= @catraca.codigo_identificador %></h2>
+<% end %>
+
+<% if @mensagem %>
+  <p><%= @mensagem %></p>
+<% end %>
+
+<% if @acessos.present? %>
+  <table>
+    <thead>
+      <tr>
+        <th>Data e hora</th>
+        <th>Matrícula</th>
+        <th>Resultado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @acessos.each do |acesso| %>
+        <tr>
+          <td><%= l(acesso.data_hora, format: "%d/%m/%Y %H:%M") %></td>
+          <td><%= acesso.usuario.matricula %></td>
+          <td>
+            <%= acesso.autorizado ? "Autorizado" : "Recusado" %>
+            <%= "(#{acesso.motivo_recusa})" if acesso.motivo_recusa.present? %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<%= link_to "Voltar", root_path %>

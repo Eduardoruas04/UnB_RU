@@ -9,6 +9,11 @@
       <%= flash[:notice] %>
     </div>
   <% end %>
+    <% if flash[:alert] %>
+    <div style="background: #f8d7da; color: #721c24; padding: 12px; margin: 20px 0; border-radius: 6px; border: 1px solid #f5c6cb;">
+      <%= flash[:alert] %>
+    </div>
+  <% end %>
 
   <!-- BARRA DE STATUS DE SESSÃO -->
   <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 8px; margin: 20px 0;">
