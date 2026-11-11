@@ -16,6 +16,7 @@ Funcionalidade: Cadastro de usuário
 
   Contexto:
     Dado que eu estou na página de cadastro
+    E eu preencho o e-mail com "maria@aluno.unb.br"
 
   #  Cenário feliz 
 
@@ -26,6 +27,7 @@ Funcionalidade: Cadastro de usuário
     E eu clico em "Cadastrar"
     Então eu devo ver a mensagem "Cadastro realizado com sucesso"
     E uma conta deve existir para a matrícula "190012345"
+    E a conta da matrícula "190012345" deve possuir uma única carteira com saldo zero
 
   #  Matrícula inválida 
 
