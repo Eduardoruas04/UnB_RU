@@ -1,0 +1,46 @@
+<div style="max-width: 900px; margin: 30px auto; font-family: system-ui, -apple-system, sans-serif;">
+  <div style="background: #004b23; color: white; padding: 20px; border-radius: 8px;">
+    <h1 style="margin: 0;">Terminal de Validação</h1>
+    <p style="margin: 6px 0 0;">
+      Catraca: <strong><%= @catraca&.codigo_identificador || "nenhuma catraca ativa" %></strong>
+      <% if @turno %>
+        · Turno: <%= @turno.nome %> (<%= @turno.horario_inicio.strftime("%H:%M") %> – <%= @turno.horario_fim.strftime("%H:%M") %>)
+        · Tarifa: R$ <%= format("%.2f", @turno.valor_refeicao_centavos / 100.0).tr(".", ",") %>
+      <% else %>
+        · Nenhuma refeição em atendimento
+      <% end %>
+    </p>
+  </div>
+
+  <% if notice %>
+    <div style="background: #d4edda; color: #155724; padding: 14px; margin: 20px 0; border-radius: 6px; font-weight: bold;"><%= notice %></div>
+  <% end %>
+  <% if alert %>
+    <div style="background: #f8d7da; color: #721c24; padding: 14px; margin: 20px 0; border-radius: 6px; font-weight: bold;"><%= alert %></div>
+  <% end %>
+
+  <div style="border: 1px solid #dee2e6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h3 style="margin-top: 0;">Leitura da identificação</h3>
+    <%= form_with url: catraca_leitura_path, method: :post do |f| %>
+      <%= f.label :matricula, "Matrícula" %>
+      <%= f.text_field :matricula, style: "padding: 8px; margin: 0 8px;" %>
+      <%= f.submit "Ler identificação", style: "background: #004b23; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;" %>
+    <% end %>
+  </div>
+
+  <% if @acesso %>
+    <div style="border: 1px solid #dee2e6; padding: 20px; border-radius: 8px;">
+      <p>Estudante: <strong><%= @acesso.usuario.nome %></strong> (Matrícula: <%= @acesso.usuario.matricula %>)</p>
+      <p>Saldo atual: <strong>R$ <%= format("%.2f", @acesso.usuario.carteira.saldo_centavos / 100.0).tr(".", ",") %></strong></p>
+      <% if @acesso.aguardando_passagem? %>
+        <p>Aguardando a passagem do estudante pela catraca.</p>
+        <div style="display: flex; gap: 10px;">
+          <%= button_to "Confirmar passagem", catraca_confirmar_path(@acesso), style: "background: #198754; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;" %>
+          <%= button_to "Encerrar sem passagem", catraca_encerrar_path(@acesso), style: "background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;" %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <p style="margin-top: 20px;"><%= link_to "← Voltar à Central de Testes", root_path %></p>
+</div>
