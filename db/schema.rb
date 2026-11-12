@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_135824) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_12_223631) do
   create_table "acessos", force: :cascade do |t|
     t.integer "usuario_id", null: false
     t.integer "catraca_id", null: false
@@ -21,6 +21,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_135824) do
     t.datetime "data_hora"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "forma_acesso", default: "QR Code App"
     t.index ["catraca_id"], name: "index_acessos_on_catraca_id"
     t.index ["turno_id"], name: "index_acessos_on_turno_id"
     t.index ["usuario_id"], name: "index_acessos_on_usuario_id"
