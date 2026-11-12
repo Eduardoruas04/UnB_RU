@@ -1,0 +1,67 @@
+<%# ========================================================================== %>
+<%# Interface de Pagamento via PIX Instantaneo (Figma US03)                    %>
+<%# Apresenta QR Code simulado, chave copia-e-cola e simulador de liquidacao   %>
+<%# ========================================================================== %>
+
+<div style="max-width: 600px; margin: 40px auto; padding: 0 20px;">
+  <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); text-align: center;">
+
+    <!-- Icone Visual do Metodo PIX -->
+    <div style="background: #f0fdf4; color: #16a34a; width: 56px; height: 56px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.75rem; margin-bottom: 16px;">
+      💠
+    </div>
+
+    <h1 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">Pagamento via PIX Instantâneo</h1>
+    <p style="color: #64748b; font-size: 0.9rem; margin: 0 0 24px 0;">Abra o app do seu banco e escaneie o QR Code abaixo para liberar seu saldo.</p>
+
+    <!-- Simulacao do QR Code conforme o Figma -->
+    <div style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 24px; display: inline-block; margin-bottom: 24px;">
+      <div style="font-family: monospace; font-size: 3rem; letter-spacing: 4px;">
+        ⬛⬜⬛⬜⬛<br>
+        ⬜⬛⬜⬛⬜<br>
+        ⬛⬜⬛⬜⬛
+      </div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; margin-top: 8px;">QR CODE SIMULADO DO RU</div>
+    </div>
+
+    <!-- Valor Total e Quantidade de Refeicoes -->
+    <div style="background: #f1f5f9; border-radius: 8px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.95rem;">
+      <span style="color: #475569;">Valor a pagar (<%= @recarga.quantidade_refeicoes %> refeições):</span>
+      <span style="font-weight: 800; font-size: 1.25rem; color: #0f172a;">
+        R$ <%= sprintf('%.2f', @recarga.valor_centavos / 100.0).tr('.', ',') %>
+      </span>
+    </div>
+
+    <!-- Chave PIX Copia-e-Cola com Botao de Copia -->
+    <div style="margin-bottom: 24px; text-align: left;">
+      <label style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Chave Pix (Copia e Cola):</label>
+      <div style="display: flex; gap: 8px; margin-top: 6px;">
+        <input type="text" id="codigo-pix" readonly value="<%= @recarga.txid_pix %>@unb.br" style="flex: 1; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; font-family: monospace; font-size: 0.85rem; color: #334155;">
+        <button type="button" id="btn-copiar" onclick="copiarPix()" style="background: #e2e8f0; color: #1e293b; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer;">
+          Copiar Código
+        </button>
+      </div>
+      <div id="msg-copiado" style="display: none; font-size: 0.75rem; color: #16a34a; font-weight: 600; margin-top: 4px;">Código PIX copiado para a área de transferência!</div>
+    </div>
+
+    <!-- Botoes de Acao para Testes e Confirmacao de Pagamento -->
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <%# Botao que confirma o pagamento e dispara a transacao atomica %>
+      <%= button_to "Confirmar Pagamento PIX", confirmar_recarga_path(@recarga), method: :post, id: "btn-confirmar-pix", style: "width: 100%; background: #16a34a; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer;" %>
+
+      <%# Botao para testar o cenario triste de expiracao de prazo %>
+      <%= button_to "Simular Prazo Expirado (Sem Pagamento)", confirmar_recarga_path(@recarga, expirado: true), method: :post, style: "width: 100%; background: none; border: 1px solid #cbd5e1; color: #64748b; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer;" %>
+    </div>
+
+  </div>
+</div>
+
+<%# Script auxiliar para copiar a chave PIX para a area de transferencia %>
+<script>
+  function copiarPix() {
+    const input = document.getElementById("codigo-pix");
+    input.select();
+    navigator.clipboard.writeText(input.value);
+    document.getElementById("msg-copiado").style.display = "block";
+  }
+</script>
