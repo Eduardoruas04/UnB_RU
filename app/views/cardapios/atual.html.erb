@@ -1,0 +1,27 @@
+<div style="max-width: 700px; margin: 30px auto; font-family: system-ui, -apple-system, sans-serif;">
+  <h1>Cardápio da refeição atual</h1>
+
+  <% if @turno.nil? %>
+    <p style="background: #f8f9fa; padding: 14px; border-radius: 6px;">Não há refeição em atendimento no momento</p>
+  <% elsif @cardapio.nil? %>
+    <p style="background: #f8d7da; color: #721c24; padding: 14px; border-radius: 6px;">Cardápio da refeição atual indisponível</p>
+  <% else %>
+    <div id="cardapio-atual" style="border: 1px solid #dee2e6; padding: 20px; border-radius: 8px;">
+      <h2 style="margin-top: 0;"><%= @dia %> · <%= @turno.nome %></h2>
+      <p style="color: #6c757d;">
+        <%= @turno.horario_inicio.strftime("%H:%M") %> às <%= @turno.horario_fim.strftime("%H:%M") %> · <%= @cardapio.restaurante.nome %>
+        <span style="background: #d4edda; color: #155724; padding: 2px 8px; border-radius: 10px; margin-left: 6px;">Refeição em serviço</span>
+      </p>
+      <% ItemCardapio::OPCOES.each do |chave, rotulo| %>
+        <% item = @cardapio.itens_cardapio.find { |i| i.opcao == chave } %>
+        <% next if item.nil? %>
+        <div data-opcao="<%= chave %>" style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 10px;">
+          <strong><%= rotulo %></strong><br>
+          <%= item.tipo %>: <%= item.descricao %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <p style="margin-top: 20px;"><%= link_to "← Voltar à Central de Testes", root_path %></p>
+</div>

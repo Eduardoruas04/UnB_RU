@@ -19,6 +19,7 @@ Rails.application.routes.draw do
 
   # --- Luiz Felipe Bessa (Issues #6 e #10) ---
   # Exemplo: get "cardapio", to: "cardapios#atual"
+  get "cardapio", to: "cardapios#atual", as: :cardapio_atual
 
   # --- Victor Malta (Issues #7 e #8) ---
   # Exemplo: namespace :admin do ... end
