@@ -1,0 +1,235 @@
+<%# ========================================================================== %>
+<%# Interface do Estudante: Extrato e Historico de Refeicoes (Figma US04)        %>
+<%# Layout com cards de indicadores, filtros e tabela com exportacao em PDF      %>
+<%# ========================================================================== %>
+
+<!-- Barra Superior do Portal do Estudante -->
+<header style="background: white; border-bottom: 1px solid #e2e8f0; padding: 12px 32px; display: flex; justify-content: space-between; align-items: center;">
+  <div style="display: flex; align-items: center; gap: 24px;">
+    <div style="font-weight: 800; font-size: 1.15rem; color: #044b2c; letter-spacing: -0.5px;">
+      RU UnB <span style="color: #0284c7; font-weight: 600;">Digital</span>
+      <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; letter-spacing: 0.5px;">PORTAL DO ESTUDANTE</div>
+    </div>
+    <nav style="display: flex; gap: 20px; font-size: 0.9rem; font-weight: 600;">
+      <a href="/" style="color: #64748b; text-decoration: none;">Início</a>
+      <a href="/recargas/new" style="color: #64748b; text-decoration: none;">Recarga</a>
+      <a href="/extrato" style="color: #0284c7; text-decoration: none; border-bottom: 2px solid #0284c7; padding-bottom: 4px;">Extrato</a>
+      <a href="#" style="color: #64748b; text-decoration: none;">FastPass</a>
+    </nav>
+  </div>
+
+  <!-- Identificacao e Saldo Atual do Aluno no Topo -->
+  <div style="display: flex; align-items: center; gap: 16px;">
+    <div style="text-align: right;">
+      <div style="font-size: 0.85rem; font-weight: 700; color: #1e293b;"><%= @usuario.nome %></div>
+      <div style="font-size: 0.75rem; color: #64748b;">Matrícula: <%= @usuario.matricula %></div>
+    </div>
+    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 6px 14px; border-radius: 20px; text-align: right;">
+      <div style="font-size: 0.65rem; font-weight: 700; color: #166534; text-transform: uppercase;">Saldo RU</div>
+      <div style="font-size: 0.95rem; font-weight: 800; color: #15803d;" id="saldo-topo">
+        <%= @saldo_atual %> <span style="font-size: 0.8rem; font-weight: 600;">(<%= @saldo_refeicoes %> refs)</span>
+      </div>
+    </div>
+    <form action="/dev_logout" method="post" style="margin: 0;">
+      <input type="hidden" name="_method" value="delete">
+      <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+      <button type="submit" style="background: none; border: 1px solid #e2e8f0; color: #64748b; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+        Sair
+      </button>
+    </form>
+  </div>
+</header>
+
+<!-- Conteiner Central do Extrato -->
+<main style="max-width: 1100px; margin: 32px auto; padding: 0 20px;">
+
+  <!-- Titulo e Subtitulo da Tela -->
+  <div style="margin-bottom: 24px;">
+    <h1 style="font-size: 1.75rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">
+      Extrato e Histórico de Refeições
+    </h1>
+    <p style="font-size: 0.95rem; color: #64748b; margin: 0;">
+      Consulte seu consumo detalhado no RU, acompanhe recargas e exporte relatórios oficiais em PDF.
+    </p>
+  </div>
+
+  <!-- Cards de Indicadores Superiores (Figma US04) -->
+  <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 28px;">
+    <!-- Card 1: Total Gasto -->
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span style="font-size: 0.85rem; font-weight: 700; color: #64748b;">Total Gasto no Mês</span>
+        <span style="background: #fef2f2; color: #dc2626; padding: 6px 10px; border-radius: 8px; font-size: 1rem;">💳</span>
+      </div>
+      <div style="font-size: 1.6rem; font-weight: 800; color: #0f172a;" id="card-total-gasto">
+        <%= @total_gasto %>
+      </div>
+      <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">Acessos autorizados no RU</div>
+    </div>
+
+    <!-- Card 2: Refeicoes Realizadas -->
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span style="font-size: 0.85rem; font-weight: 700; color: #64748b;">Refeições Realizadas</span>
+        <span style="background: #eff6ff; color: #2563eb; padding: 6px 10px; border-radius: 8px; font-size: 1rem;">🍽️</span>
+      </div>
+      <div style="font-size: 1.6rem; font-weight: 800; color: #0f172a;" id="card-refeicoes-realizadas">
+        <%= @refeicoes_realizadas %> <span style="font-size: 1rem; font-weight: 600; color: #64748b;">refeições</span>
+      </div>
+      <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">Passagens confirmadas em catraca</div>
+    </div>
+
+    <!-- Card 3: Total Recarregado -->
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span style="font-size: 0.85rem; font-weight: 700; color: #64748b;">Total Recarregado</span>
+        <span style="background: #f0fdf4; color: #16a34a; padding: 6px 10px; border-radius: 8px; font-size: 1rem;">⚡</span>
+      </div>
+      <div style="font-size: 1.6rem; font-weight: 800; color: #15803d;" id="card-total-recarregado">
+        <%= @total_recarregado %>
+      </div>
+      <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">Recargas aprovadas via PIX/Cartão</div>
+    </div>
+  </section>
+
+  <!-- Painel de Filtros e Exportacao (Figma US04) -->
+  <section style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+    <%= form_with url: extrato_path, method: :get, data: { turbo: false }, id: "form-filtros-extrato", style: "display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between;" do |f| %>
+      <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;">
+        
+        <!-- Filtro: Periodo -->
+        <div>
+          <label for="periodo" style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">
+            Período de Referência
+          </label>
+          <%= select_tag :periodo,
+                         options_for_select([["Todos os períodos", ""], ["Últimos 30 dias", "Últimos 30 dias"], ["Últimos 7 dias", "Últimos 7 dias"], ["Este Mês", "Este Mês"]], params[:periodo]),
+                         id: "periodo",
+                         style: "padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem; color: #1e293b; background: white;" %>
+        </div>
+
+        <!-- Filtro: Tipo de Refeicao / Evento -->
+        <div>
+          <label for="tipo_refeicao" style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">
+            Tipo de Refeição / Evento
+          </label>
+          <%= select_tag :tipo_refeicao,
+                         options_for_select([["Todas as refeições", ""], ["Almoço", "Almoço"], ["Jantar", "Jantar"], ["Café da Manhã", "Café da Manhã"], ["Recarga de Saldo", "Recarga"]], params[:tipo_refeicao]),
+                         id: "tipo_refeicao",
+                         style: "padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem; color: #1e293b; background: white;" %>
+        </div>
+
+        <!-- Filtro: Forma de Acesso -->
+        <div>
+          <label for="forma_acesso" style="display: block; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">
+            Forma de Acesso
+          </label>
+          <%= select_tag :forma_acesso,
+                         options_for_select([["Todas as formas", ""], ["QR Code App", "QR Code App"], ["Carteirinha Física", "Carteirinha Física"], ["PIX Instantâneo", "PIX Instantâneo"], ["Cartão de Crédito", "Cartão de Crédito"]], params[:forma_acesso]),
+                         id: "forma_acesso",
+                         style: "padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem; color: #1e293b; background: white;" %>
+        </div>
+
+        <!-- Botoes de Acao de Filtro -->
+        <div style="display: flex; gap: 8px;">
+          <button type="submit" style="background: #0f172a; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+            Filtrar
+          </button>
+          <%= link_to "Limpar Filtros", extrato_path, style: "background: #f1f5f9; color: #475569; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center;" %>
+        </div>
+      </div>
+
+      <!-- Botao de Destaque: Exportar PDF (Figma US04) -->
+      <div>
+        <button type="submit"
+                formaction="<%= exportar_pdf_extrato_path %>"
+                data-turbo="false"
+                id="btn-exportar-pdf"
+                style="background: #0284c7; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(2,132,199,0.2);">
+          <span>📄</span> Exportar PDF
+        </button>
+      </div>
+    <% end %>
+  </section>
+
+  <!-- Tabela de Lancamentos Contabeis (Figma US04) -->
+  <section style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+    <div style="padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin: 0;">
+        Histórico de Movimentações (<%= @lancamentos.size %>)
+      </h2>
+      <span style="font-size: 0.8rem; color: #64748b;">
+        Ordenado cronologicamente (mais recentes primeiro)
+      </span>
+    </div>
+
+    <% if @lancamentos.empty? %>
+      <div style="padding: 48px 20px; text-align: center; color: #94a3b8;">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">📂</div>
+        <div style="font-weight: 700; color: #475569; font-size: 1rem;">Nenhum lançamento encontrado</div>
+        <div style="font-size: 0.85rem; margin-top: 4px;">Não há registros correspondentes aos filtros selecionados.</div>
+      </div>
+    <% else %>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem;">
+          <thead>
+            <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; color: #475569; font-size: 0.75rem; text-transform: uppercase;">
+              <th style="padding: 12px 20px; font-weight: 700;">Data e Hora</th>
+              <th style="padding: 12px 20px; font-weight: 700;">Refeição / Evento</th>
+              <th style="padding: 12px 20px; font-weight: 700;">Restaurante / Local</th>
+              <th style="padding: 12px 20px; font-weight: 700;">Forma de Acesso</th>
+              <th style="padding: 12px 20px; font-weight: 700; text-align: right;">Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @lancamentos.each do |lancamento| %>
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <!-- Data e Hora -->
+                <td style="padding: 14px 20px; color: #334155; font-weight: 500;">
+                  <%= lancamento.data_formatada %>
+                </td>
+
+                <!-- Refeicao / Evento com Badge -->
+                <td style="padding: 14px 20px;">
+                  <% if lancamento.credito? %>
+                    <span style="background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">
+                      ⚡ <%= lancamento.evento %>
+                    </span>
+                  <% elsif lancamento.evento.to_s.downcase.include?("almoço") %>
+                    <span style="background: #eff6ff; color: #1d4ed8; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">
+                      ☀️ <%= lancamento.evento %>
+                    </span>
+                  <% elsif lancamento.evento.to_s.downcase.include?("jantar") %>
+                    <span style="background: #faf5ff; color: #7e22ce; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">
+                      🌙 <%= lancamento.evento %>
+                    </span>
+                  <% else %>
+                    <span style="background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">
+                      🍽️ <%= lancamento.evento %>
+                    </span>
+                  <% end %>
+                </td>
+
+                <!-- Restaurante / Local -->
+                <td style="padding: 14px 20px; color: #475569;">
+                  <%= lancamento.restaurante %>
+                </td>
+
+                <!-- Forma de Acesso -->
+                <td style="padding: 14px 20px; color: #64748b;">
+                  <%= lancamento.forma_acesso %>
+                </td>
+
+                <!-- Valor Formatado -->
+                <td style="padding: 14px 20px; text-align: right; font-weight: 800; font-size: 0.95rem; color: <%= lancamento.credito? ? '#16a34a' : '#0f172a' %>;">
+                  <%= lancamento.valor_formatado %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </section>
+</main>
+
