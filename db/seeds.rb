@@ -76,13 +76,19 @@ turno_jantar = Turno.find_or_create_by!(nome: "Jantar") do |t|
   t.valor_refeicao_centavos = 450
 end
 
+Turno.find_or_create_by!(nome: "Café da Manhã") do |t|
+  t.horario_inicio = "07:00"
+  t.horario_fim = "09:00"
+  t.valor_refeicao_centavos = 450
+end
+
 # 4. Cardápio de Hoje
 cardapio = Cardapio.find_or_create_by!(restaurante: restaurante, turno: turno_almoco, data_refeicao: Date.current)
 
 itens = [
-  { categoria: "prato_principal", descricao: "Strogonoff de Frango" },
-  { categoria: "complemento_ovolactovegetariano", descricao: "Quiche de Espinafre e Ricota" },
-  { categoria: "complemento_vegetariano_estrito", descricao: "Ensopado de Grão-de-Bico com Legumes" },
+  { categoria: "prato_principal_padrao", descricao: "Strogonoff de Frango" },
+  { categoria: "prato_principal_ovolactovegetariano", descricao: "Quiche de Espinafre e Ricota" },
+  { categoria: "prato_principal_vegetariano_estrito", descricao: "Ensopado de Grão-de-Bico com Legumes" },
   { categoria: "guarnicao", descricao: "Arroz Branco e Feijão Carioca" },
   { categoria: "salada", descricao: "Salada Mista de Folhas e Tomate" },
   { categoria: "sobremesa", descricao: "Maçã / Laranja" }
