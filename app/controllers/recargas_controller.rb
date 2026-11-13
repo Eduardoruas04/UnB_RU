@@ -99,14 +99,6 @@ class RecargasController < ApplicationController
 
   private
 
-  # Garante que apenas estudantes autenticados acessem a funcionalidade
-  def autenticar_usuario!
-    unless logged_in?
-      flash[:alert] = "Você precisa estar autenticado para acessar esta página."
-      redirect_to "/login"
-    end
-  end
-
   def set_recarga
     @recarga = current_user.recargas.find(params[:id])
   end

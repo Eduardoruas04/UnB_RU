@@ -39,7 +39,7 @@ Quando("eu clico em {string}") do |botao|
   @usuarios_antes_do_cadastro = Usuario.count
   @carteiras_antes_do_cadastro = Carteira.count
   @contas_por_matricula_antes = Usuario.group(:matricula).count
-  click_button botao
+  click_link_or_button botao
 end
 
 Então("eu devo ver a mensagem {string}") do |mensagem|

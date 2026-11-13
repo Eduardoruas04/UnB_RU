@@ -29,6 +29,13 @@ Rails.application.routes.draw do
     end
   end
 
+  # Issue #11 (Extra): Extrato e Historico de Refeicoes com Exportacao em PDF (Figma US04)
+  # - GET /extrato              => Visualizacao do extrato com indicadores e filtros (US04)
+  # - GET /extrato/exportar_pdf => Download do extrato formal consolidado em PDF via Prawn
+  resource :extrato, only: [ :show ] do
+    get :exportar_pdf, on: :member
+  end
+
   # --- Hagatta Reis (Issues #4 e Bonus) ---
   # Exemplo: get "login", to: "sessions#new"
 

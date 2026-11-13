@@ -85,19 +85,9 @@ Quando("eu seleciono a forma de pagamento {string}") do |forma|
   find("#metodo-pagamento-input", visible: :all).set(forma)
 end
 
-# Clica em botões genéricos da interface (ex: "Confirmar", "Copiar Código")
-Quando("eu clico em {string}") do |texto_botao|
-  click_on texto_botao
-end
-
 # Simula o clique no botão de webhook/aprovação imediata do PIX
 Quando("o pagamento PIX é confirmado") do
   click_button "Confirmar Pagamento PIX"
-end
-
-# Verifica se mensagens informativas ou de erro aparecem no banner de alerta/notificação
-Então("eu devo ver a mensagem {string}") do |mensagem|
-  expect(page).to have_content(mensagem)
 end
 
 # Recarrega a carteira do banco para validar o crédito das refeições e a exibição no cabeçalho

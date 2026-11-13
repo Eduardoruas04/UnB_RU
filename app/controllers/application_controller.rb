@@ -8,4 +8,11 @@ class ApplicationController < ActionController::Base
   def logged_in?
     current_user.present?
   end
+
+  def autenticar_usuario!
+    unless logged_in?
+      flash[:alert] = "Você precisa estar autenticado para acessar esta página."
+      redirect_to "/login"
+    end
+  end
 end
