@@ -63,7 +63,7 @@ RSpec.describe Acesso, type: :model do
       antigo = registrar(catraca_um, hora(12, 0))
       recente = registrar(catraca_um, hora(12, 30))
 
-      expect(catraca_um.acessos.order(data_hora: :desc).to_a).to eq([recente, antigo])
+      expect(catraca_um.acessos.order(data_hora: :desc).to_a).to eq([ recente, antigo ])
     end
   end
 end

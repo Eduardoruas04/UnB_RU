@@ -23,8 +23,8 @@ Rails.application.routes.draw do
 
   # --- Victor Malta (Issues #7 e #8) ---
   scope "/admin" do
-    resources :restaurantes, except: [:show]
-    resources :catracas, only: [:create, :edit, :update, :destroy]
+    resources :restaurantes, except: [ :show ]
+    resources :catracas, only: [ :create, :edit, :update, :destroy ]
   end
 
   get "catraca/historico", to: "historicos#show", as: :historico_local

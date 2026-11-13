@@ -5,7 +5,7 @@ end
 
 Given("existem as catracas {string} e {string} no restaurante {string}") do |cod1, cod2, nome|
   restaurante = Restaurante.find_or_create_by!(nome: nome)
-  [cod1, cod2].each do |codigo|
+  [ cod1, cod2 ].each do |codigo|
     Catraca.find_or_create_by!(codigo_identificador: codigo) { |c| c.restaurante = restaurante }
   end
 end

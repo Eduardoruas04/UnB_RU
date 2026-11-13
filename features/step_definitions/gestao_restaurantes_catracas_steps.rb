@@ -39,7 +39,7 @@ end
 
 Given("que já existem as catracas {string} e {string} no restaurante {string}") do |cod1, cod2, nome|
   restaurante = Restaurante.find_or_create_by!(nome: nome)
-  [cod1, cod2].each do |codigo|
+  [ cod1, cod2 ].each do |codigo|
     Catraca.find_or_create_by!(codigo_identificador: codigo) { |c| c.restaurante = restaurante }
   end
   recarregar_gestao
@@ -130,7 +130,7 @@ When("um funcionário autenticado abre a seleção de catraca na aplicação de 
 end
 
 Then("ele deve ver {string} na lista de catracas do restaurante {string}") do |codigo, nome|
-  expect(page).to have_select("Catraca", with_options: ["#{codigo} - #{nome}"])
+  expect(page).to have_select("Catraca", with_options: [ "#{codigo} - #{nome}" ])
 end
 
 Then("ele não deve ver {string} na lista de catracas") do |codigo|
