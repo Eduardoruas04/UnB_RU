@@ -7,6 +7,6 @@ class CreateInscricoesFastpass < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
-    add_index :inscricoes_fastpass, [:sorteio_fastpass_id, :usuario_id], unique: true, name: "idx_inscricoes_fastpass_unique"
+    add_index :inscricoes_fastpass, [ :sorteio_fastpass_id, :usuario_id ], unique: true, name: "idx_inscricoes_fastpass_unique"
   end
 end
