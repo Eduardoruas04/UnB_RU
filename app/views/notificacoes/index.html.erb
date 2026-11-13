@@ -1,0 +1,13 @@
+<h1>Notificações FastPass</h1>
+<% if @notificacoes.empty? %>
+  <p>Você ainda não possui notificações do FastPass.</p>
+<% else %>
+  <% @notificacoes.each do |notificacao| %>
+    <article>
+      <h2><%= notificacao.titulo %></h2>
+      <p><%= notificacao.mensagem %></p>
+      <p>Recebida em <%= notificacao.enviado_em.in_time_zone("America/Sao_Paulo").strftime("%d/%m/%Y às %H:%M") %></p>
+    </article>
+  <% end %>
+<% end %>
+<%= link_to "Voltar à central", root_path %>
