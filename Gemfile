@@ -70,4 +70,10 @@ group :development do
   gem "web-console"
 end
 
+
 gem "database_cleaner-active_record", "~> 2.2", group: :test
+
+group :test do
+  gem "database_cleaner-active_record"
+end
+

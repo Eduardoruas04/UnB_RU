@@ -1,0 +1,17 @@
+<h1>Cadastro de usuário</h1>
+
+<% if @usuario.errors.any? %>
+  <ul role="alert">
+    <% @usuario.errors.each do |erro| %>
+      <li><%= erro.message %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<%= form_with model: @usuario do |form| %>
+  <p><%= form.label :nome, "Nome" %><br><%= form.text_field :nome %></p>
+  <p><%= form.label :matricula, "Matrícula" %><br><%= form.text_field :matricula %></p>
+  <p><%= form.label :email, "E-mail" %><br><%= form.email_field :email %></p>
+  <p><%= form.label :password, "Senha" %><br><%= form.password_field :password %></p>
+  <%= form.submit "Cadastrar" %>
+<% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_135824) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_11_180000) do
   create_table "acessos", force: :cascade do |t|
     t.integer "usuario_id", null: false
     t.integer "catraca_id", null: false
@@ -95,6 +95,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_135824) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["sorteio_fastpass_id"], name: "index_notificacoes_on_sorteio_fastpass_id"
+    t.index ["usuario_id", "sorteio_fastpass_id"], name: "index_notificacoes_fastpass_unicas", unique: true, where: "tipo = 'fastpass'"
     t.index ["usuario_id"], name: "index_notificacoes_on_usuario_id"
   end
 

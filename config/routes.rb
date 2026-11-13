@@ -9,7 +9,8 @@ Rails.application.routes.draw do
   # ============================================================================
 
   # --- Eduardo Ruas (Issues #1 e #15) ---
-  # Exemplo: resources :usuarios, only: [:new, :create]
+  resources :notificacoes, only: [ :index ]
+  resources :usuarios, only: [ :new, :create ]
 
   # --- Pablo Trajano (Issues #2 e #11) ---
   # Exemplo: resources :recargas, only: [:new, :create, :show]
