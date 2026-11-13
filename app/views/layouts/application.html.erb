@@ -23,7 +23,25 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 0;">
+    <%# ====================================================================== %>
+    <%# Mensagens Flash Globais (Sucesso e Erro)                              %>
+    <%# Notificam o usuario e permitem assercoes do Capybara nos testes BDD     %>
+    <%# ====================================================================== %>
+
+    <% if flash[:notice] %>
+      <div id="flash-notice" style="background: #dcfce7; color: #15803d; border: 1px solid #86efac; padding: 14px 24px; border-radius: 8px; margin: 20px auto; max-width: 1000px; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+        <span>✓</span> <%= flash[:notice] %>
+      </div>
+    <% end %>
+
+    <% if flash[:alert] %>
+      <div id="flash-alert" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 14px 24px; border-radius: 8px; margin: 20px auto; max-width: 1000px; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+        <span>⚠️</span> <%= flash[:alert] %>
+      </div>
+    <% end %>
+
+    <%# Renderiza o conteudo da pagina atual %>
     <%= yield %>
   </body>
 </html>

@@ -1,0 +1,326 @@
+<%# ========================================================================== %>
+<%# Interface do Estudante: Recarga de Saldo (Figma US03)                      %>
+<%# Layout dividido em 2 colunas com selecao de pacotes e resumo interativo     %>
+<%# ========================================================================== %>
+
+<!-- Barra Superior do Portal do Estudante -->
+<header style="background: white; border-bottom: 1px solid #e2e8f0; padding: 12px 32px; display: flex; justify-content: space-between; align-items: center;">
+  <div style="display: flex; align-items: center; gap: 24px;">
+    <div style="font-weight: 800; font-size: 1.15rem; color: #044b2c; letter-spacing: -0.5px;">
+      RU UnB <span style="color: #0284c7; font-weight: 600;">Digital</span>
+      <div style="font-size: 0.65rem; color: #64748b; font-weight: 700; letter-spacing: 0.5px;">PORTAL DO ESTUDANTE</div>
+    </div>
+    <nav style="display: flex; gap: 20px; font-size: 0.9rem; font-weight: 600;">
+      <a href="/" style="color: #64748b; text-decoration: none;">Início</a>
+      <a href="/recargas/new" style="color: #0284c7; text-decoration: none; border-bottom: 2px solid #0284c7; padding-bottom: 4px;">Recarga</a>
+      <a href="/extrato" style="color: #64748b; text-decoration: none;">Extrato</a>
+      <a href="#" style="color: #64748b; text-decoration: none;">FastPass</a>
+    </nav>
+  </div>
+
+  <!-- Identificacao e Saldo Atual do Aluno no Topo -->
+  <div style="display: flex; align-items: center; gap: 16px;">
+    <div style="text-align: right;">
+      <div style="font-size: 0.85rem; font-weight: 700; color: #1e293b;"><%= @usuario.nome %></div>
+      <div style="font-size: 0.75rem; color: #64748b;">Matrícula: <%= @usuario.matricula %></div>
+    </div>
+    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 6px 12px; border-radius: 6px; text-align: right;">
+      <div style="font-size: 0.65rem; color: #166534; font-weight: 700; text-transform: uppercase;">Saldo RU</div>
+      <div id="saldo-topo" style="font-size: 0.95rem; font-weight: 800; color: #15803d;">
+        R$ <%= sprintf('%.2f', @carteira.saldo_centavos / 100.0).tr('.', ',') %>
+        <span style="font-size: 0.8rem; font-weight: 600;">(<%= @saldo_refeicoes %> refs)</span>
+      </div>
+    </div>
+    <%= button_to "Sair", dev_logout_path, method: :delete, style: "background: none; border: none; color: #64748b; font-size: 0.85rem; font-weight: 600; cursor: pointer;" %>
+  </div>
+</header>
+
+<main style="max-width: 1050px; margin: 32px auto; padding: 0 20px;">
+  <!-- Card de Identificacao da Conta do Estudante -->
+  <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <div style="background: #e0f2fe; color: #0284c7; width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">💳</div>
+      <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Conta do Estudante</div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: #0f172a;"><%= @usuario.nome %></div>
+      </div>
+    </div>
+    <div style="text-align: right;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Saldo Atual</div>
+      <div id="saldo-banner" style="font-size: 1.35rem; font-weight: 800; color: #15803d;">
+        R$ <%= sprintf('%.2f', @carteira.saldo_centavos / 100.0).tr('.', ',') %>
+        <span style="font-size: 0.95rem; font-weight: 600; color: #64748b;">(<%= @saldo_refeicoes %> refs)</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 24px;">
+    <h1 style="font-size: 1.75rem; font-weight: 800; color: #0f172a; margin: 0 0 4px 0;">Recarregar Saldo</h1>
+    <p style="color: #64748b; font-size: 0.95rem; margin: 0;">Adicione créditos para usar no RU.</p>
+  </div>
+
+  <%= form_with url: recargas_path, method: :post, id: "form-recarga", local: true do |f| %>
+    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 28px; align-items: start;">
+
+      <!-- Coluna da Esquerda: Passos 1 e 2 -->
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+
+        <!-- PASSO 1: Selecao do Pacote de Refeicoes -->
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+            <span style="background: #0284c7; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;">1</span>
+            <h2 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin: 0;">Escolha o Pacote de Refeições</h2>
+          </div>
+
+          <!-- Grid dos 4 Cards de Pacotes Pre-definidos -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
+            <% [
+              { qtd: 2, valor: "9,00", desc: "R$ 4,50 / un" },
+              { qtd: 5, valor: "22,50", desc: "1 semana" },
+              { qtd: 10, valor: "45,00", desc: "2 semanas" },
+              { qtd: 20, valor: "90,00", desc: "Mensal" }
+            ].each do |pacote| %>
+              <label class="pacote-card" data-qtd="<%= pacote[:qtd] %>" onclick="selecionarPacote(<%= pacote[:qtd] %>)" style="border: 2px solid #e2e8f0; border-radius: 10px; padding: 14px; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-weight: 700; color: #0f172a; font-size: 0.95rem;"><%= pacote[:qtd] %> Refeições</span>
+                  <input type="radio" name="pacote_opcao" value="<%= pacote[:qtd] %>" class="radio-pacote" <%= 'checked' if pacote[:qtd] == @quantidade %>>
+                </div>
+                <div style="margin-top: 8px;">
+                  <div style="font-size: 1.25rem; font-weight: 800; color: #0284c7;">R$ <%= pacote[:valor] %></div>
+                  <div style="font-size: 0.75rem; color: #64748b;"><%= pacote[:desc] %></div>
+                </div>
+              </label>
+            <% end %>
+          </div>
+
+          <!-- Controle de Quantidade Flexivel ("Outra quantidade") -->
+          <div style="border-top: 1px solid #f1f5f9; padding-top: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 0.85rem; font-weight: 600; color: #475569;">Outra quantidade:</span>
+              <div style="display: inline-flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden;">
+                <button type="button" id="btn-menos" onclick="alterarQuantidade(-1)" style="background: #f8fafc; border: none; padding: 6px 12px; font-size: 1rem; cursor: pointer; color: #334155; font-weight: bold;">−</button>
+                <input type="text" name="quantidade_refeicoes" id="input-quantidade" value="<%= @quantidade %>" oninput="atualizarCalculos(parseInt(this.value))" style="width: 50px; text-align: center; border: none; font-weight: 700; font-size: 0.95rem; outline: none; padding: 6px 0;">
+                <button type="button" id="btn-mais" onclick="alterarQuantidade(1)" style="background: #f8fafc; border: none; padding: 6px 12px; font-size: 1rem; cursor: pointer; color: #334155; font-weight: bold;">+</button>
+              </div>
+            </div>
+            <!-- Exibicao do Calculo Dinamico -->
+            <div id="calculo-dinamico" style="font-size: 0.85rem; font-weight: 600; color: #16a34a;">
+              <%= @quantidade %> × R$ 4,50 = R$ <%= @total_formatado %>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASSO 2: Selecao do Metodo de Pagamento -->
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="background: #0284c7; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;">2</span>
+              <h2 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin: 0;">Selecione o Método</h2>
+            </div>
+            <span style="font-size: 0.75rem; color: #64748b; font-weight: 600;">2 OPÇÕES</span>
+          </div>
+
+          <!-- Abas Interativas de Pagamento -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px;">
+            <button type="button" id="tab-pix" onclick="selecionarMetodo('PIX Instantâneo')" class="tab-metodo ativa" style="border: 2px solid #0284c7; background: #f0f9ff; color: #0284c7; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <span>💠</span> PIX Instantâneo
+            </button>
+            <button type="button" id="tab-cartao" onclick="selecionarMetodo('Cartão de Crédito')" class="tab-metodo" style="border: 1px solid #cbd5e1; background: white; color: #475569; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <span>💳</span> Cartão de Crédito
+            </button>
+          </div>
+
+          <input type="hidden" name="metodo_pagamento" id="metodo-pagamento-input" value="PIX Instantâneo">
+
+          <!-- Painel Informativo do PIX -->
+          <div id="painel-pix" style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; gap: 16px; align-items: center;">
+              <div style="background: white; border: 1px solid #e2e8f0; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 1.75rem;">
+                📱
+              </div>
+              <div>
+                <div style="font-size: 0.7rem; font-weight: 800; color: #16a34a; text-transform: uppercase;">Instantâneo</div>
+                <div style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Aponte o app do seu banco</div>
+                <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">Compensação imediata. O saldo é liberado em segundos.</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 4px;">Chave Pix (Copia e Cola):</div>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="codigo-pix" readonly value="00020126580014br.gov.bcb.pix0136ru-recarga-darcy@unb.br" style="flex: 1; background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: monospace; font-size: 0.75rem; color: #334155;">
+                <button type="button" id="btn-copiar-codigo" onclick="navigator.clipboard.writeText(document.getElementById('codigo-pix').value)" style="background: #e2e8f0; color: #1e293b; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer;">
+                  Copiar Código
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Painel de Simulacao de Cartao de Credito -->
+          <div id="painel-cartao" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div>
+                <label style="font-size: 0.75rem; font-weight: 600; color: #475569;">Simular Status do Cartão:</label>
+                <select name="cartao_status" id="cartao_status" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; margin-top: 4px;">
+                  <option value="valido">Cartão Válido (Aprovação Imediata)</option>
+                  <option value="recusado">Cartão com Saldo Insuficiente (Recusado)</option>
+                  <option value="vencido">Cartão com Validade Vencida</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Coluna da Direita: Card Resumo da Recarga (Figma US03) -->
+      <aside id="card-resumo" style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: sticky; top: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin: 0;">Resumo da Recarga</h3>
+          <span style="font-size: 1rem;">🧾</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem;">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: #64748b;">Refeições:</span>
+            <span id="resumo-refeicoes" style="font-weight: 700; color: #0f172a;"><%= @quantidade %> refeições</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: #64748b;">Tarifa unitária:</span>
+            <span style="font-weight: 600; color: #0f172a;">R$ 4,50 / un</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: #64748b;">Pagamento:</span>
+            <span id="resumo-metodo" style="font-weight: 600; color: #0284c7;">PIX Instantâneo</span>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 4px 0;">
+
+          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #64748b;">
+            <span>Saldo atual (<%= @saldo_refeicoes %> refs):</span>
+            <span>R$ <%= sprintf('%.2f', @carteira.saldo_centavos / 100.0).tr('.', ',') %></span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+            <span style="color: #64748b;">Novo saldo:</span>
+            <span id="resumo-novo-saldo" style="font-weight: 700; color: #15803d;">
+              <%= @novo_saldo_refs %> refeições
+            </span>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 4px 0;">
+
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px;">
+            <span style="font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase;">Total</span>
+            <div id="resumo-total" style="font-size: 1.6rem; font-weight: 800; color: #0f172a;">
+              R$ <%= @total_formatado %>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px;">
+          <%= f.submit "Confirmar", id: "btn-confirmar", style: "width: 100%; background: #0284c7; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: background 0.2s;" %>
+        </div>
+      </aside>
+
+    </div>
+  <% end %>
+</main>
+
+<%# ========================================================================== %>
+<%# Script Dinamico Client-Side: Funcoes globais compativeis com Turbo Drive   %>
+<%# ========================================================================== %>
+<script>
+  const TARIFA = 4.50;
+  const saldoAtualRefs = <%= @saldo_refeicoes %>;
+
+  // Atualiza os nos visuais de calculo e o card lateral de resumo
+  function atualizarCalculos(qtd) {
+    const inputQtd = document.getElementById("input-quantidade");
+    const calculoDin = document.getElementById("calculo-dinamico");
+    const resumoRefeicoes = document.getElementById("resumo-refeicoes");
+    const resumoTotal = document.getElementById("resumo-total");
+    const resumoNovoSaldo = document.getElementById("resumo-novo-saldo");
+
+    if (isNaN(qtd) || qtd === "" || qtd <= 0) {
+      if (calculoDin) calculoDin.innerText = "-";
+      if (resumoTotal) resumoTotal.innerText = "R$ 0,00";
+      return;
+    }
+
+    const total = (qtd * TARIFA).toFixed(2).replace(".", ",");
+    if (calculoDin) calculoDin.innerText = `${qtd} × R$ 4,50 = R$ ${total}`;
+    if (resumoRefeicoes) resumoRefeicoes.innerText = `${qtd} refeições`;
+    if (resumoTotal) resumoTotal.innerText = `R$ ${total}`;
+    if (resumoNovoSaldo) resumoNovoSaldo.innerText = `${saldoAtualRefs + parseInt(qtd)} refeições`;
+  }
+
+  // Incrementa ou decrementa a quantidade nos botoes + e -
+  function alterarQuantidade(delta) {
+    const inputQtd = document.getElementById("input-quantidade");
+    let val = parseInt(inputQtd.value) || 1;
+    val += delta;
+    if (val < 1) val = 1;
+    if (val > 100) val = 100;
+    inputQtd.value = val;
+    atualizarCalculos(val);
+
+    const radio = document.querySelector(`input[name='pacote_opcao'][value='${val}']`);
+    if (radio) {
+      radio.checked = true;
+    } else {
+      document.querySelectorAll(".radio-pacote").forEach(r => r.checked = false);
+    }
+  }
+
+  // Atualiza o formulario ao clicar em um card de pacote pre-definido
+  function selecionarPacote(qtd) {
+    const inputQtd = document.getElementById("input-quantidade");
+    if (inputQtd) inputQtd.value = qtd;
+    const radio = document.querySelector(`input[name='pacote_opcao'][value='${qtd}']`);
+    if (radio) radio.checked = true;
+    atualizarCalculos(qtd);
+  }
+
+  // Alterna as abas visuais entre PIX e Cartao de Credito
+  function selecionarMetodo(metodo) {
+    const tabPix = document.getElementById("tab-pix");
+    const tabCartao = document.getElementById("tab-cartao");
+    const painelPix = document.getElementById("painel-pix");
+    const painelCartao = document.getElementById("painel-cartao");
+    const inputMetodo = document.getElementById("metodo-pagamento-input");
+    const resumoMetodo = document.getElementById("resumo-metodo");
+
+    if (inputMetodo) inputMetodo.value = metodo;
+    if (resumoMetodo) resumoMetodo.innerText = metodo;
+
+    if (metodo === "PIX Instantâneo") {
+      if (tabPix) {
+        tabPix.style.borderColor = "#0284c7";
+        tabPix.style.background = "#f0f9ff";
+        tabPix.style.color = "#0284c7";
+      }
+      if (tabCartao) {
+        tabCartao.style.borderColor = "#cbd5e1";
+        tabCartao.style.background = "white";
+        tabCartao.style.color = "#475569";
+      }
+      if (painelPix) painelPix.style.display = "flex";
+      if (painelCartao) painelCartao.style.display = "none";
+    } else {
+      if (tabCartao) {
+        tabCartao.style.borderColor = "#0284c7";
+        tabCartao.style.background = "#f0f9ff";
+        tabCartao.style.color = "#0284c7";
+      }
+      if (tabPix) {
+        tabPix.style.borderColor = "#cbd5e1";
+        tabPix.style.background = "white";
+        tabPix.style.color = "#475569";
+      }
+      if (painelPix) painelPix.style.display = "none";
+      if (painelCartao) painelCartao.style.display = "block";
+    }
+  }
+</script>
