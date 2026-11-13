@@ -27,13 +27,13 @@ RSpec.describe "Cadastro de usuário", type: :request do
 
   {
     matricula: [
-      ["", "Matrícula não pode ficar em branco"],
-      ["12345", "Matrícula deve ter 9 dígitos"],
-      ["1900123456", "Matrícula deve ter 9 dígitos"],
-      ["abc123def", "Matrícula deve conter apenas números"]
+      [ "", "Matrícula não pode ficar em branco" ],
+      [ "12345", "Matrícula deve ter 9 dígitos" ],
+      [ "1900123456", "Matrícula deve ter 9 dígitos" ],
+      [ "abc123def", "Matrícula deve conter apenas números" ]
     ],
-    password: [["123", "Senha deve ter no mínimo 8 caracteres"], ["", "Senha é obrigatória"]],
-    nome: [["", "Nome é obrigatório"]]
+    password: [ [ "123", "Senha deve ter no mínimo 8 caracteres" ], [ "", "Senha é obrigatória" ] ],
+    nome: [ [ "", "Nome é obrigatório" ] ]
   }.each do |campo, casos|
     casos.each do |valor, mensagem|
       it "recusa #{campo}=#{valor.inspect} sem criar usuário ou carteira" do
