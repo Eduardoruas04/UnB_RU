@@ -9,38 +9,38 @@ Funcionalidade: Autenticação do funcionário
   Para autenticar minha sessão e operar o sistema de forma segura
 
   Contexto:
-    Dado que existe um funcionário ativo com matrícula "FUNC001" e senha "senhaSegura1"
-    E existe um funcionário inativo com matrícula "FUNC002" e senha "senhaSegura1"
+    Dado que existe um funcionário ativo com matrícula "111111001" e senha "senhaSegura1"
+    E existe um funcionário inativo com matrícula "222222002" e senha "senhaSegura1"
     E eu estou na página de login da aplicação de controle
 
   Cenário: Login com credenciais válidas (feliz)
-    Quando eu preencho a matrícula com "FUNC001"
+    Quando eu preencho a matrícula com "111111001"
     E eu preencho a senha com "senhaSegura1"
     E eu clico em "Entrar"
     Então eu devo ser redirecionado para o painel da aplicação de controle
     E eu devo ver a mensagem "Login realizado com sucesso"
 
   Cenário: Logout da aplicação de controle com sucesso (feliz)
-    Dado que eu estou autenticado no painel com a matrícula "FUNC001"
+    Dado que eu estou autenticado no painel com a matrícula "111111001"
     Quando eu clico no botão "Sair"
     Então a minha sessão deve ser encerrada
     E eu devo ser redirecionado para a página de login com a mensagem "Sessão encerrada com sucesso"
 
   Cenário: Login com senha incorreta (triste)
-    Quando eu preencho a matrícula com "FUNC001"
+    Quando eu preencho a matrícula com "111111001"
     E eu preencho a senha com "senhaErrada"
     E eu clico em "Entrar"
     Então eu devo ver a mensagem "Matrícula ou senha inválidos"
     E eu devo continuar na página de login
 
   Cenário: Login com matrícula inexistente (triste)
-    Quando eu preencho a matrícula com "FUNC999"
+    Quando eu preencho a matrícula com "999999999"
     E eu preencho a senha com "senhaSegura1"
     E eu clico em "Entrar"
     Então eu devo ver a mensagem "Matrícula ou senha inválidos"
 
   Cenário: Login com funcionário inativo (triste)
-    Quando eu preencho a matrícula com "FUNC002"
+    Quando eu preencho a matrícula com "222222002"
     E eu preencho a senha com "senhaSegura1"
     E eu clico em "Entrar"
     Então eu devo ver a mensagem "Conta de funcionário inativa"
