@@ -15,7 +15,12 @@ Rails.application.routes.draw do
   # Exemplo: resources :recargas, only: [:new, :create, :show]
 
   # --- Hagatta Reis (Issues #4 e Bonus) ---
-  # Exemplo: get "login", to: "sessions#new"
+get "login", to: "sessions#new", as: :login
+post "login", to: "sessions#create"
+delete "logout", to: "sessions#destroy", as: :logout
+get "painel_controle", to: "painel_controle#index", as: :painel_controle
+
+resources :avaliacoes, only: [ :new, :create ]
 
   # --- Luiz Felipe Bessa (Issues #6 e #10) ---
   # Exemplo: get "cardapio", to: "cardapios#atual"
