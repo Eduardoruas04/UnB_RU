@@ -43,7 +43,6 @@ Rails.application.routes.draw do
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy", as: :logout
   get "painel_controle", to: "painel_controle#index", as: :painel_controle
-  
   resources :avaliacoes, only: [ :new, :create ]
 
   # --- Luiz Felipe Bessa (Issues #6 e #10) ---
