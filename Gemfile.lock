@@ -478,7 +478,7 @@ DEPENDENCIES
   bundler-audit
   capybara
   cucumber-rails
-  database_cleaner-active_record
+  database_cleaner-active_record (~> 2.2)
   debug
   factory_bot_rails
   image_processing (~> 1.2)

@@ -100,4 +100,53 @@ itens.each do |item|
   end
 end
 
+# 5. Histórico de Lançamentos de Exemplo (Issue #11 / Figma US04)
+# Popula acessos e recargas para o 'Estudante com Saldo' poder testar o extrato e exportação em PDF
+carteira_aluno = aluno_com_saldo.carteira
+
+if aluno_com_saldo.recargas.empty?
+  aluno_com_saldo.recargas.create!(
+    carteira: carteira_aluno,
+    quantidade_refeicoes: 10,
+    valor_centavos: 4500,
+    status: "paga",
+    metodo_pagamento: "PIX Instantâneo",
+    created_at: 14.days.ago
+  )
+  aluno_com_saldo.recargas.create!(
+    carteira: carteira_aluno,
+    quantidade_refeicoes: 5,
+    valor_centavos: 2250,
+    status: "paga",
+    metodo_pagamento: "Cartão de Crédito",
+    created_at: 4.days.ago
+  )
+end
+
+if aluno_com_saldo.acessos.empty?
+  # Almoços recentes com QR Code App
+  8.times do |i|
+    aluno_com_saldo.acessos.create!(
+      catraca: catraca1,
+      turno: turno_almoco,
+      valor_pago_centavos: 450,
+      autorizado: true,
+      forma_acesso: "QR Code App",
+      data_hora: (i + 1).days.ago.change(hour: 12, min: 20)
+    )
+  end
+
+  # Jantares recentes com Carteirinha e QR Code
+  5.times do |i|
+    aluno_com_saldo.acessos.create!(
+      catraca: catraca1,
+      turno: turno_jantar,
+      valor_pago_centavos: 450,
+      autorizado: true,
+      forma_acesso: i.even? ? "QR Code App" : "Carteirinha Física",
+      data_hora: (i + 2).days.ago.change(hour: 18, min: 40)
+    )
+  end
+end
+
 puts "== Carga mestre finalizada com sucesso! =="

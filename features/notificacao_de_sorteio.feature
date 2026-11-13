@@ -26,7 +26,7 @@ Funcionalidade: Notificação de sorteio do FastPass
     Dado que existe um turno de almoço às "12:00"
     E que o horário programado da notificação é "11:00"
 
-  #  Cenários felizes 
+  #  Cenários felizes
 
   Cenário: Estudante sorteado recebe notificação
     Dado que o sorteio do FastPass foi realizado
@@ -45,7 +45,7 @@ Funcionalidade: Notificação de sorteio do FastPass
     Então o sistema deve enviar uma notificação ao estudante "190012345"
     E a notificação deve informar "Você não foi sorteado para o FastPass"
 
-  # Cenários tristes 
+  # Cenários tristes
 
   Cenário: Notificação antes do horário programado
     Dado que o sorteio do FastPass foi realizado
@@ -72,4 +72,11 @@ Funcionalidade: Notificação de sorteio do FastPass
     Dado que o estudante "190012345" está inscrito no sorteio
     E que o sorteio do FastPass ainda não foi realizado
     Quando o horário atual for "11:00"
+    Então o sistema não deve enviar a notificação ao estudante "190012345"
+
+  Cenário: Não enviar notificação atrasada
+    Dado que o sorteio do FastPass foi realizado
+    E que o estudante "190012345" está inscrito no sorteio
+    E que o estudante "190012345" foi sorteado
+    Quando o horário atual for "11:01"
     Então o sistema não deve enviar a notificação ao estudante "190012345"

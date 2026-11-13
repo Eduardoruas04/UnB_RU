@@ -1,0 +1,24 @@
+<div style="max-width: 720px; margin: 40px auto; font-family: system-ui, -apple-system, sans-serif;">
+  <div style="background: #004b23; color: white; padding: 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h1 style="margin: 0; font-size: 1.4rem;">Painel da Aplicação de Controle</h1>
+      <p style="margin: 4px 0 0; font-size: 0.9rem;">
+        Funcionário: <strong><%= current_user.nome %></strong> (<%= current_user.matricula %>)
+      </p>
+    </div>
+
+    <%= button_to "Sair", logout_path, method: :delete, style: "background: #dc3545; color: white; border: none; padding: 10px 18px; border-radius: 4px; font-weight: 600; cursor: pointer;" %>
+  </div>
+
+  <% if flash[:notice] %>
+    <div style="background: #d4edda; color: #155724; padding: 12px; margin-top: 20px; border-radius: 6px; border: 1px solid #c3e6cb;">
+      <%= flash[:notice] %>
+    </div>
+  <% end %>
+
+  <div style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; border-radius: 8px; margin-top: 20px;">
+    <h2 style="margin-top: 0; font-size: 1.1rem;">Operação do Restaurante Universitário</h2>
+    <p style="color: #495057;">Sessão autenticada com sucesso.</p>
+    <p><%= link_to "Voltar para Central de Testes", root_path %></p>
+  </div>
+</div>
