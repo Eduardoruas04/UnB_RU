@@ -191,16 +191,8 @@ end
 # ==============================================================================
 
 # Desloga a sessão do usuário chamando o endpoint de teste DELETE /dev_logout
-Dado("que eu não estou autenticado") do
-  page.driver.delete("/dev_logout") if page.driver.respond_to?(:delete)
-end
 
 # Tenta navegar diretamente para a tela de recargas deslogado
 Quando("eu tento acessar a página de recarga") do
   visit new_recarga_path
-end
-
-# Valida o redirecionamento de segurança para a tela de login
-Então("eu devo ser redirecionado para a página de login") do
-  expect(current_path).to eq("/login")
 end

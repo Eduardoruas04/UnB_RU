@@ -2,9 +2,6 @@ Rails.application.routes.draw do
   # Rota raiz (Menu de Testes Visuais da Fase 0)
   root "home#index"
 
-  # Rota provisoria de fallback para login enquanto a Issue #4 (Hagatta) esta sendo desenvolvida
-  get "login", to: "home#index"
-
   # Acoes de login e logout rapido da Central de Testes (Fase 0)
   post "dev_login", to: "home#dev_login"
   delete "dev_logout", to: "home#dev_logout"
@@ -51,6 +48,7 @@ Rails.application.routes.draw do
   post "catraca/operacao/leitura", to: "catraca_operacao#ler", as: :catraca_leitura
   post "catraca/operacao/acessos/:id/confirmar", to: "catraca_operacao#confirmar", as: :catraca_confirmar
   post "catraca/operacao/acessos/:id/encerrar", to: "catraca_operacao#encerrar", as: :catraca_encerrar
+  get "cardapio", to: "cardapios#atual", as: :cardapio_atual
 
   # --- Victor Malta (Issues #7 e #8) ---
   scope "/admin" do

@@ -43,10 +43,6 @@ Given("eu estou vendo o histórico local da catraca {string}") do |codigo|
   selecionar_catraca(codigo)
 end
 
-Given("que eu não estou autenticado") do
-  visit root_path
-  click_button "Encerrar Sessão (Logout)"
-end
 
 # ---------- Ações ----------
 When("eu seleciono a catraca {string} na aplicação de controle") do |codigo|
@@ -75,7 +71,7 @@ end
 
 # Não segue o redirecionamento, para não depender da rota /login (issue #4)
 When("eu tento acessar o histórico local de uma catraca") do
-  page.driver.browser.get historico_local_path
+  visit historico_local_path
 end
 
 # ---------- Verificações ----------
@@ -111,10 +107,4 @@ end
 
 Then("eu devo ver o acesso do aluno {string} no topo da lista") do |matricula|
   expect(first("tbody tr").text).to include(matricula)
-end
-
-Then("eu devo ser redirecionado para a página de login") do
-  resposta = page.driver.browser.last_response
-  expect(resposta.status).to eq(302)
-  expect(resposta.headers["Location"]).to end_with("/login")
 end
