@@ -14,7 +14,8 @@ Rails.application.routes.draw do
   # ============================================================================
 
   # --- Eduardo Ruas (Issues #1 e #15) ---
-  # Exemplo: resources :usuarios, only: [:new, :create]
+  resources :notificacoes, only: [ :index ]
+  resources :usuarios, only: [ :new, :create ]
 
   # --- Pablo Trajano (Issues #2 e #11) ---
   # Issue #2 (MVP): Recarga de Saldo de Refeicoes com PIX e Cartao (Figma US03)

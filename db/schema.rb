@@ -96,6 +96,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_223631) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["sorteio_fastpass_id"], name: "index_notificacoes_on_sorteio_fastpass_id"
+    t.index ["usuario_id", "sorteio_fastpass_id"], name: "index_notificacoes_fastpass_unicas", unique: true, where: "tipo = 'fastpass'"
     t.index ["usuario_id"], name: "index_notificacoes_on_usuario_id"
   end
 
