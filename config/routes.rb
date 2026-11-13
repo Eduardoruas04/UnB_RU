@@ -17,8 +17,8 @@ Rails.application.routes.draw do
   resources :notificacoes, only: [ :index ]
   resources :usuarios, only: [ :new, :create ]
 
-# --- Pablo Trajano (Issues #2 e #11) ---
-# Exemplo: resources :recargas, only: [:new, :create, :show]
+  # --- Pablo Trajano (Issues #2 e #11) ---
+  # Exemplo: resources :recargas, only: [:new, :create, :show]
   # --- Pablo Trajano (Issues #2 e #11) ---
   # Issue #2 (MVP): Recarga de Saldo de Refeicoes com PIX e Cartao (Figma US03)
   # - GET  /recargas/new           => Formulario de recarga com pacotes e calculo dinâmico
@@ -38,13 +38,13 @@ Rails.application.routes.draw do
     get :exportar_pdf, on: :member
   end
 
-# --- Hagatta Reis (Issues #4 e Bonus) ---
-get "login", to: "sessions#new", as: :login
-post "login", to: "sessions#create"
-delete "logout", to: "sessions#destroy", as: :logout
-get "painel_controle", to: "painel_controle#index", as: :painel_controle
-
-resources :avaliacoes, only: [ :new, :create ]
+  # --- Hagatta Reis (Issues #4 e Bonus) ---
+  get "login", to: "sessions#new", as: :login
+  post "login", to: "sessions#create"
+  delete "logout", to: "sessions#destroy", as: :logout
+  get "painel_controle", to: "painel_controle#index", as: :painel_controle
+  
+  resources :avaliacoes, only: [ :new, :create ]
 
   # --- Luiz Felipe Bessa (Issues #6 e #10) ---
   # Exemplo: get "cardapio", to: "cardapios#atual"
