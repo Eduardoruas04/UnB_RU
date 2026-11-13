@@ -49,5 +49,10 @@ Rails.application.routes.draw do
   # Exemplo: get "cardapio", to: "cardapios#atual"
 
   # --- Victor Malta (Issues #7 e #8) ---
-  # Exemplo: namespace :admin do ... end
+  scope "/admin" do
+    resources :restaurantes, except: [ :show ]
+    resources :catracas, only: [ :create, :edit, :update, :destroy ]
+  end
+
+  get "catraca/historico", to: "historicos#show", as: :historico_local
 end

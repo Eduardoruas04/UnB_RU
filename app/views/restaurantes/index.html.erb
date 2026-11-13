@@ -1,0 +1,43 @@
+<h1>Gestão de restaurantes e catracas</h1>
+
+<% if flash[:notice] %><p class="notice"><%= flash[:notice] %></p><% end %>
+<% if flash[:alert] %><p class="alert"><%= flash[:alert] %></p><% end %>
+
+<h2>Novo restaurante</h2>
+<%= form_with model: @restaurante, url: restaurantes_path do |f| %>
+  <%= render "restaurantes/erros", registro: @restaurante %>
+  <%= f.label :nome, "Nome do restaurante" %>
+  <%= f.text_field :nome %>
+  <%= f.label :campus, "Campus" %>
+  <%= f.text_field :campus %>
+  <%= f.submit "Salvar restaurante" %>
+<% end %>
+
+<h2>Nova catraca</h2>
+<%= form_with model: @catraca, url: catracas_path do |f| %>
+  <%= render "restaurantes/erros", registro: @catraca %>
+  <%= f.label :codigo_identificador, "Identificador da catraca" %>
+  <%= f.text_field :codigo_identificador %>
+  <%= f.label :restaurante_id, "Restaurante" %>
+  <%= f.collection_select :restaurante_id, @restaurantes, :id, :nome, include_blank: "Selecione" %>
+  <%= f.submit "Salvar catraca" %>
+<% end %>
+
+<h2>Restaurantes cadastrados</h2>
+<% @restaurantes.each do |restaurante| %>
+  <section id="restaurante_<%= restaurante.id %>">
+    <h3><%= restaurante.nome %></h3>
+    <%= link_to "Editar", edit_restaurante_path(restaurante) %>
+    <%= button_to "Remover", restaurante_path(restaurante), method: :delete %>
+
+    <ul>
+      <% restaurante.catracas.each do |catraca| %>
+        <li>
+          <%= catraca.codigo_identificador %> (<%= catraca.status %>)
+          <%= link_to "Editar", edit_catraca_path(catraca) %>
+          <%= button_to "Remover", catraca_path(catraca), method: :delete %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
