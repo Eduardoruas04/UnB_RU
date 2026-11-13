@@ -1,6 +1,6 @@
 # ---------- Contexto ----------
 Given("que eu estou autenticado como funcionário") do
-  entrar_como(criar_usuario(nome: "Operador de Catraca", matricula: "FUNC01", papel: "funcionario"))
+  entrar_como(criar_usuario(nome: "Operador de Catraca", matricula: "000000002", papel: "funcionario"))
 end
 
 Given("existem as catracas {string} e {string} no restaurante {string}") do |cod1, cod2, nome|

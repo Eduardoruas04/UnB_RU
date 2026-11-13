@@ -1,6 +1,6 @@
 # ---------- Contexto ----------
 Given("que eu estou autenticado como administrador") do
-  entrar_como(criar_usuario(nome: "Administrador RU", matricula: "ADMIN01", papel: "administrador"))
+  entrar_como(criar_usuario(nome: "Administrador RU", matricula: "000000001", papel: "administrador"))
 end
 
 Given("eu estou na página de gestão de restaurantes e catracas") do
@@ -56,9 +56,6 @@ When("eu preencho o nome do restaurante com {string}") do |nome|
   fill_in "Nome do restaurante", with: nome
 end
 
-When("eu clico em {string}") do |rotulo|
-  click_button rotulo
-end
 
 When("eu edito o restaurante {string} e altero o nome para {string}") do |atual, novo|
   editar_restaurante(atual, novo)
@@ -94,10 +91,6 @@ When("eu removo a catraca {string}") do |codigo|
 end
 
 # ---------- Verificações ----------
-Then("eu devo ver a mensagem {string}") do |mensagem|
-  expect(page).to have_content(mensagem)
-end
-
 Then("nenhum restaurante deve ser criado") do
   expect(Restaurante.count).to eq(@restaurantes_antes)
 end
@@ -124,7 +117,7 @@ end
 
 # ---------- Uso pelos funcionários ----------
 Given("que eu estou autenticado como funcionário sem perfil de administrador") do
-  entrar_como(criar_usuario(nome: "Operador de Catraca", matricula: "FUNC01", papel: "funcionario"))
+  entrar_como(criar_usuario(nome: "Operador de Catraca", matricula: "000000002", papel: "funcionario"))
 end
 
 When("eu tento acessar a página de gestão de restaurantes e catracas") do
@@ -132,7 +125,7 @@ When("eu tento acessar a página de gestão de restaurantes e catracas") do
 end
 
 When("um funcionário autenticado abre a seleção de catraca na aplicação de controle") do
-  entrar_como(criar_usuario(nome: "Operador de Catraca", matricula: "FUNC01", papel: "funcionario"))
+  entrar_como(criar_usuario(nome: "Operador de Catraca", matricula: "000000002", papel: "funcionario"))
   visit historico_local_path
 end
 
