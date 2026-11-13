@@ -12,10 +12,10 @@ Rails.application.routes.draw do
   resources :notificacoes, only: [ :index ]
   resources :usuarios, only: [ :new, :create ]
 
-  # --- Pablo Trajano (Issues #2 e #11) ---
-  # Exemplo: resources :recargas, only: [:new, :create, :show]
+# --- Pablo Trajano (Issues #2 e #11) ---
+# Exemplo: resources :recargas, only: [:new, :create, :show]
 
-  # --- Hagatta Reis (Issues #4 e Bonus) ---
+# --- Hagatta Reis (Issues #4 e Bonus) ---
 get "login", to: "sessions#new", as: :login
 post "login", to: "sessions#create"
 delete "logout", to: "sessions#destroy", as: :logout
