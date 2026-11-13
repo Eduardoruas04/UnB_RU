@@ -31,7 +31,7 @@
   <% if @acesso %>
     <div style="border: 1px solid #dee2e6; padding: 20px; border-radius: 8px;">
       <p>Estudante: <strong><%= @acesso.usuario.nome %></strong> (Matrícula: <%= @acesso.usuario.matricula %>)</p>
-      <p>Saldo atual: <strong>R$ <%= format("%.2f", @acesso.usuario.carteira.saldo_centavos / 100.0).tr(".", ",") %></strong></p>
+      <p>Saldo atual: <strong>R$ <%= format("%.2f", @acesso.usuario.carteira&.saldo_centavos.to_i / 100.0).tr(".", ",") %></strong></p>
       <% if @acesso.aguardando_passagem? %>
         <p>Aguardando a passagem do estudante pela catraca.</p>
         <div style="display: flex; gap: 10px;">
