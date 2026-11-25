@@ -63,6 +63,9 @@ group :development, :test do
   gem "selenium-webdriver"
   gem "factory_bot_rails"
   gem "simplecov", require: false
+  # Qualidade de codigo e documentacao (Sprint 3)
+  gem "rubycritic", require: false
+  gem "rdoc", require: false
 end
 
 group :development do
