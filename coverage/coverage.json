@@ -1,0 +1,4561 @@
+{
+  "$schema": "https://raw.githubusercontent.com/simplecov-ruby/simplecov/main/schemas/coverage-v1.3.schema.json",
+  "meta": {
+    "schema_version": "1.3",
+    "simplecov_version": "1.3.2",
+    "command_name": "RSpec",
+    "command_names": [
+      "RSpec"
+    ],
+    "project_name": "Unb ru",
+    "timestamp": "2026-11-24T18:02:14.387-03:00",
+    "root": "/home/victor/Projeto-RU/UnB_RU",
+    "commit": "4d211da89364433977e450997241d01e72277ebc",
+    "primary_coverage": "line",
+    "line_coverage": true,
+    "branch_coverage": true,
+    "method_coverage": false
+  },
+  "total": {
+    "lines": {
+      "covered": 475,
+      "missed": 189,
+      "omitted": 577,
+      "total": 664,
+      "percent": 71.53614457831326,
+      "strength": 2.5466867469879517
+    },
+    "branches": {
+      "covered": 0,
+      "missed": 0,
+      "total": 0,
+      "percent": 100.0,
+      "strength": 0.0
+    }
+  },
+  "coverage": {
+    "app/controllers/application_controller.rb": {
+      "source": [
+        "class ApplicationController < ActionController::Base",
+        "  helper_method :current_user, :logged_in?",
+        "",
+        "  def current_user",
+        "    @current_user ||= Usuario.find_by(id: session[:usuario_id]) if session[:usuario_id]",
+        "  end",
+        "",
+        "  def logged_in?",
+        "    current_user.present?",
+        "  end",
+        "",
+        "  def autenticar_usuario!",
+        "    unless logged_in?",
+        "      flash[:alert] = \"Você precisa estar autenticado para acessar esta página.\"",
+        "      redirect_to \"/login\"",
+        "    end",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        null,
+        1,
+        39,
+        null,
+        null,
+        1,
+        20,
+        null,
+        null,
+        1,
+        8,
+        2,
+        2,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 10,
+      "missed_lines": 0,
+      "omitted_lines": 8,
+      "total_lines": 10,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/controllers/avaliacoes_controller.rb": {
+      "source": [
+        "class AvaliacoesController < ApplicationController",
+        "  before_action :exigir_usuario_autenticado!",
+        "",
+        "  def new",
+        "    @avaliacao = Avaliacao.new",
+        "  end",
+        "",
+        "  def create",
+        "    @avaliacao = Avaliacao.new(avaliacao_params)",
+        "    acesso_hoje = buscar_acesso_disponivel_hoje",
+        "",
+        "    if acesso_hoje.nil?",
+        "      flash.now[:alert] = \"Você precisa ter consumido uma refeição hoje para avaliar\"",
+        "      return render :new, status: :unprocessable_entity",
+        "    end",
+        "",
+        "    if avaliacao_params[:nota].blank?",
+        "      flash.now[:alert] = \"Selecione uma nota para a refeição\"",
+        "      return render :new, status: :unprocessable_entity",
+        "    end",
+        "",
+        "    @avaliacao.usuario = current_user",
+        "    @avaliacao.acesso = acesso_hoje",
+        "",
+        "    if @avaliacao.save",
+        "      redirect_to new_avaliacao_path, notice: \"Obrigado pelo seu feedback!\"",
+        "    else",
+        "      flash.now[:alert] = \"Selecione uma nota para a refeição\"",
+        "      render :new, status: :unprocessable_entity",
+        "    end",
+        "  end",
+        "",
+        "  private",
+        "",
+        "  def exigir_usuario_autenticado!",
+        "    return if logged_in?",
+        "",
+        "    redirect_to login_path, alert: \"Faça login para avaliar a refeição\"",
+        "  end",
+        "",
+        "  def avaliacao_params",
+        "    params.require(:avaliacao).permit(:nota, :comentario)",
+        "  end",
+        "",
+        "  def buscar_acesso_disponivel_hoje",
+        "    current_user.acessos",
+        "                .where(autorizado: true, data_hora: Time.current.all_day)",
+        "                .where.not(id: Avaliacao.select(:acesso_id))",
+        "                .order(data_hora: :desc)",
+        "                .first",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        null,
+        1,
+        1,
+        null,
+        null,
+        1,
+        5,
+        5,
+        null,
+        5,
+        2,
+        2,
+        null,
+        null,
+        3,
+        1,
+        1,
+        null,
+        null,
+        2,
+        2,
+        null,
+        2,
+        1,
+        null,
+        1,
+        1,
+        null,
+        null,
+        null,
+        1,
+        null,
+        1,
+        7,
+        null,
+        1,
+        null,
+        null,
+        1,
+        8,
+        null,
+        null,
+        1,
+        5,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 27,
+      "missed_lines": 0,
+      "omitted_lines": 25,
+      "total_lines": 27,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/controllers/cardapios_controller.rb": {
+      "source": [
+        "# Issue #10 - Cardápio da refeição atual",
+        "class CardapiosController < ApplicationController",
+        "  DIAS_DA_SEMANA = %w[domingo segunda-feira terça-feira quarta-feira quinta-feira sexta-feira sábado].freeze",
+        "",
+        "  def atual",
+        "    agora = Time.current.in_time_zone(\"America/Sao_Paulo\")",
+        "    @turno = Turno.em_atendimento(agora)",
+        "    return if @turno.nil?",
+        "",
+        "    @dia = DIAS_DA_SEMANA[agora.wday]",
+        "    @cardapio = Cardapio.joins(:restaurante)",
+        "                        .where(turno: @turno, data_refeicao: agora.to_date, restaurantes: { ativo: true })",
+        "                        .first",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        null,
+        1,
+        1,
+        null,
+        1,
+        4,
+        4,
+        4,
+        null,
+        3,
+        3,
+        null,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 8,
+      "missed_lines": 0,
+      "omitted_lines": 7,
+      "total_lines": 8,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/controllers/catraca_operacao_controller.rb": {
+      "source": [
+        "# Issue #6 - Validação de entrada na catraca",
+        "class CatracaOperacaoController < ApplicationController",
+        "  def show",
+        "    @catraca = Catraca.find_by(status: \"ativa\")",
+        "    @turno = Turno.em_atendimento",
+        "    @acesso = Acesso.find_by(id: params[:acesso_id])",
+        "  end",
+        "",
+        "  def ler",
+        "    catraca = Catraca.find_by(status: \"ativa\")",
+        "    turno = Turno.em_atendimento",
+        "    aluno = Usuario.find_by(matricula: params[:matricula].to_s.strip, papel: \"estudante\")",
+        "",
+        "    if catraca.nil? || turno.nil?",
+        "      redirect_to catraca_operacao_path, alert: \"Nenhuma refeição em atendimento\"",
+        "    elsif aluno.nil?",
+        "      redirect_to catraca_operacao_path, alert: \"Aluno não cadastrado\"",
+        "    elsif aluno.carteira.nil? || aluno.carteira.saldo_centavos < turno.valor_refeicao_centavos",
+        "      Acesso.create!(usuario: aluno, catraca: catraca, turno: turno, autorizado: false,",
+        "                     valor_pago_centavos: 0, motivo_recusa: \"Saldo insuficiente\", data_hora: Time.current)",
+        "      redirect_to catraca_operacao_path, alert: \"Saldo insuficiente\"",
+        "    else",
+        "      acesso = Acesso.create!(usuario: aluno, catraca: catraca, turno: turno, autorizado: true,",
+        "                              valor_pago_centavos: 0, data_hora: Time.current)",
+        "      redirect_to catraca_operacao_path(acesso_id: acesso.id), notice: \"Comando de liberação enviado para a catraca\"",
+        "    end",
+        "  end",
+        "",
+        "  def confirmar",
+        "    acesso = Acesso.find(params[:id])",
+        "    if acesso.confirmar_passagem!",
+        "      redirect_to catraca_operacao_path(acesso_id: acesso.id), notice: \"Passagem confirmada\"",
+        "    else",
+        "      redirect_to catraca_operacao_path, alert: \"Este acesso não está aguardando passagem\"",
+        "    end",
+        "  end",
+        "",
+        "  def encerrar",
+        "    acesso = Acesso.find(params[:id])",
+        "    if acesso.encerrar_sem_passagem!",
+        "      redirect_to catraca_operacao_path, notice: \"Entrada encerrada sem passagem\"",
+        "    else",
+        "      redirect_to catraca_operacao_path, alert: \"Este acesso não está aguardando passagem\"",
+        "    end",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        null,
+        1,
+        1,
+        11,
+        11,
+        11,
+        null,
+        null,
+        1,
+        7,
+        7,
+        7,
+        null,
+        7,
+        1,
+        6,
+        1,
+        5,
+        1,
+        null,
+        1,
+        null,
+        4,
+        null,
+        4,
+        null,
+        null,
+        null,
+        1,
+        2,
+        2,
+        1,
+        null,
+        1,
+        null,
+        null,
+        null,
+        1,
+        1,
+        1,
+        1,
+        null,
+        0,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 96.42857142857143,
+      "covered_lines": 27,
+      "missed_lines": 1,
+      "omitted_lines": 18,
+      "total_lines": 28,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/controllers/catracas_controller.rb": {
+      "source": [
+        "class CatracasController < ApplicationController",
+        "  include ControleDeAcesso",
+        "  before_action :exigir_administrador",
+        "  before_action :carregar_catraca, only: %i[edit update destroy]",
+        "",
+        "  def create",
+        "    @catraca = Catraca.new(catraca_params)",
+        "    if @catraca.save",
+        "      redirect_to restaurantes_path, notice: \"Catraca cadastrada com sucesso\"",
+        "    else",
+        "      @restaurantes = Restaurante.includes(:catracas).order(:nome)",
+        "      @restaurante = Restaurante.new",
+        "      render \"restaurantes/index\", status: :unprocessable_entity",
+        "    end",
+        "  end",
+        "",
+        "  def edit",
+        "    @restaurantes = Restaurante.order(:nome)",
+        "  end",
+        "",
+        "  def update",
+        "    if @catraca.update(catraca_params)",
+        "      redirect_to restaurantes_path, notice: \"Catraca atualizada com sucesso\"",
+        "    else",
+        "      @restaurantes = Restaurante.order(:nome)",
+        "      render :edit, status: :unprocessable_entity",
+        "    end",
+        "  end",
+        "",
+        "  def destroy",
+        "    @catraca.destroy",
+        "    redirect_to restaurantes_path, notice: \"Catraca removida com sucesso\"",
+        "  end",
+        "",
+        "  private",
+        "",
+        "  def carregar_catraca",
+        "    @catraca = Catraca.find(params[:id])",
+        "  end",
+        "",
+        "  def catraca_params",
+        "    params.require(:catraca).permit(:codigo_identificador, :restaurante_id, :status)",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        0,
+        0,
+        0,
+        0,
+        null,
+        0,
+        0,
+        0,
+        0,
+        null,
+        0,
+        0,
+        0,
+        null,
+        null,
+        null,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        0,
+        null,
+        0,
+        0,
+        null,
+        null,
+        null,
+        0,
+        0,
+        0,
+        null,
+        null,
+        0,
+        null,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 26,
+      "omitted_lines": 18,
+      "total_lines": 26,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/controllers/concerns/controle_de_acesso.rb": {
+      "source": [
+        "module ControleDeAcesso",
+        "  extend ActiveSupport::Concern",
+        "",
+        "  private",
+        "",
+        "  def exigir_administrador",
+        "    return redirect_to(\"/login\") unless logged_in?",
+        "",
+        "    unless current_user.papel == \"administrador\"",
+        "      redirect_to root_path, alert: \"Acesso restrito a administradores\"",
+        "    end",
+        "  end",
+        "",
+        "  def exigir_funcionario",
+        "    return redirect_to(\"/login\") unless logged_in?",
+        "",
+        "    unless %w[funcionario administrador].include?(current_user.papel)",
+        "      redirect_to root_path, alert: \"Acesso restrito a funcionários\"",
+        "    end",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        0,
+        0,
+        null,
+        0,
+        null,
+        0,
+        0,
+        null,
+        0,
+        0,
+        null,
+        null,
+        null,
+        0,
+        0,
+        null,
+        0,
+        0,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 11,
+      "omitted_lines": 10,
+      "total_lines": 11,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/controllers/extratos_controller.rb": {
+      "source": [
+        "# frozen_string_literal: true",
+        "",
+        "# ==============================================================================",
+        "# Controller do Extrato do Estudante (app/controllers/extratos_controller.rb)",
+        "# ==============================================================================",
+        "# Responsável por:",
+        "# 1. Renderizar a interface web com filtros e métricas (Figma US04)",
+        "# 2. Exportar o histórico consolidado em formato PDF (Prawn)",
+        "# 3. Validar privacidade do aluno e tratar cenários de lista vazia / falha de serviço",
+        "# ==============================================================================",
+        "class ExtratosController < ApplicationController",
+        "  before_action :autenticar_usuario!",
+        "",
+        "  # GET /extrato",
+        "  # Exibe o extrato consolidado com cards de resumo e filtros interativos",
+        "  def show",
+        "    @usuario = current_user",
+        "    @filtros = extrair_filtros",
+        "    @extrato_service = ExtratoService.new(@usuario, @filtros)",
+        "",
+        "    @lancamentos = @extrato_service.lancamentos",
+        "    @total_gasto = @extrato_service.total_gasto_formatado",
+        "    @refeicoes_realizadas = @extrato_service.refeicoes_realizadas_count",
+        "    @total_recarregado = @extrato_service.total_recarregado_formatado",
+        "    @saldo_atual = @extrato_service.saldo_atual_formatado",
+        "    @saldo_refeicoes = @extrato_service.saldo_atual_refeicoes",
+        "  end",
+        "",
+        "  # GET /extrato/exportar_pdf",
+        "  # Gera e dispara o download do arquivo PDF filtrado",
+        "  def exportar_pdf",
+        "    @usuario = current_user",
+        "    @filtros = extrair_filtros",
+        "    @extrato_service = ExtratoService.new(@usuario, @filtros)",
+        "    @lancamentos = @extrato_service.lancamentos",
+        "",
+        "    # Cenários Tristes 5 e 6: filtro sem resultados ou histórico zerado",
+        "    if @lancamentos.empty?",
+        "      flash[:alert] = \"Não há registros para exportar\"",
+        "      redirect_to extrato_path(@filtros)",
+        "      return",
+        "    end",
+        "",
+        "    # Cenário Triste 8: tratamento de falha no serviço gerador de PDF",
+        "    begin",
+        "      raise StandardError, \"Serviço indisponível\" if defined?($pdf_service_indisponivel) && $pdf_service_indisponivel",
+        "",
+        "      pdf_bytes = ExtratoPdfGenerator.new(usuario: @usuario, extrato_service: @extrato_service).gerar",
+        "      send_data(",
+        "        pdf_bytes,",
+        "        filename: \"extrato_refeicoes_#{@usuario.matricula}.pdf\",",
+        "        type: \"application/pdf\",",
+        "        disposition: \"attachment\"",
+        "      )",
+        "    rescue StandardError => e",
+        "      Rails.logger.error(\"Erro na geracao de PDF: #{e.message}\")",
+        "      flash[:alert] = \"Não foi possível gerar o PDF. Tente novamente\"",
+        "      redirect_to extrato_path(@filtros)",
+        "    end",
+        "  end",
+        "",
+        "  private",
+        "",
+        "  # Sanitiza e extrai os parâmetros de filtro da URL",
+        "  def extrair_filtros",
+        "    params.permit(:periodo, :tipo_refeicao, :forma_acesso)",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        1,
+        1,
+        null,
+        null,
+        null,
+        1,
+        1,
+        1,
+        1,
+        null,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        1,
+        2,
+        2,
+        2,
+        2,
+        null,
+        null,
+        2,
+        1,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        1,
+        null,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        0,
+        0,
+        0,
+        null,
+        null,
+        null,
+        1,
+        null,
+        null,
+        1,
+        3,
+        null,
+        null
+      ],
+      "lines_covered_percent": 90.0,
+      "covered_lines": 27,
+      "missed_lines": 3,
+      "omitted_lines": 38,
+      "total_lines": 30,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/controllers/historicos_controller.rb": {
+      "source": [
+        "class HistoricosController < ApplicationController",
+        "  include ControleDeAcesso",
+        "  before_action :exigir_funcionario",
+        "",
+        "  def show",
+        "    session[:catraca_id] = params[:catraca_id] if params[:catraca_id].present?",
+        "    @catracas = Catraca.includes(:restaurante).order(:codigo_identificador)",
+        "",
+        "    if session[:catraca_id].blank?",
+        "      @mensagem = \"Selecione uma catraca para ver o histórico\"",
+        "      return",
+        "    end",
+        "",
+        "    @catraca = Catraca.find_by(id: session[:catraca_id])",
+        "    if @catraca.nil?",
+        "      session.delete(:catraca_id)",
+        "      @mensagem = \"Catraca não encontrada\"",
+        "      return",
+        "    end",
+        "",
+        "    @acessos = @catraca.acessos.includes(:usuario).order(data_hora: :desc)",
+        "    @mensagem = \"Nenhum acesso registrado nesta catraca\" if @acessos.empty?",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        0,
+        0,
+        0,
+        null,
+        0,
+        0,
+        0,
+        null,
+        0,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        0,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 16,
+      "omitted_lines": 8,
+      "total_lines": 16,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/controllers/home_controller.rb": {
+      "source": [
+        "class HomeController < ApplicationController",
+        "  def index",
+        "    @usuarios = Usuario.all",
+        "  end",
+        "",
+        "  # Ação para o botão de Login Rápido (Menu Dev)",
+        "  def dev_login",
+        "    usuario = Usuario.find(params[:usuario_id])",
+        "    session[:usuario_id] = usuario.id",
+        "    flash[:notice] = \"Sessão iniciada como #{usuario.nome} (#{usuario.papel.upcase})\"",
+        "    redirect_to root_path",
+        "  end",
+        "",
+        "  def dev_logout",
+        "    session[:usuario_id] = nil",
+        "    flash[:notice] = \"Sessão encerrada com sucesso.\"",
+        "    redirect_to root_path",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        1,
+        null,
+        null,
+        null,
+        1,
+        16,
+        16,
+        16,
+        16,
+        null,
+        null,
+        1,
+        1,
+        1,
+        1,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 12,
+      "missed_lines": 0,
+      "omitted_lines": 7,
+      "total_lines": 12,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/controllers/notificacoes_controller.rb": {
+      "source": [
+        "class NotificacoesController < ApplicationController",
+        "  before_action :exigir_estudante",
+        "",
+        "  def index",
+        "    @notificacoes = current_user.notificacoes.where(tipo: \"fastpass\", status_envio: \"enviada\").order(enviado_em: :desc, id: :desc)",
+        "  end",
+        "",
+        "  private",
+        "",
+        "  def exigir_estudante",
+        "    unless logged_in?",
+        "      redirect_to root_path, alert: \"Entre como estudante para consultar suas notificações.\"",
+        "      return",
+        "    end",
+        "",
+        "    head :forbidden unless current_user.papel == \"estudante\"",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        null,
+        1,
+        2,
+        null,
+        null,
+        1,
+        null,
+        1,
+        4,
+        1,
+        1,
+        null,
+        null,
+        3,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 10,
+      "missed_lines": 0,
+      "omitted_lines": 8,
+      "total_lines": 10,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/controllers/painel_controle_controller.rb": {
+      "source": [
+        "class PainelControleController < ApplicationController",
+        "  before_action :exigir_funcionario_autenticado!",
+        "",
+        "  def index",
+        "  end",
+        "",
+        "  private",
+        "",
+        "  def exigir_funcionario_autenticado!",
+        "    return if logged_in? && current_user.papel == \"funcionario\" && current_user.ativo?",
+        "",
+        "    session[:usuario_id] = nil",
+        "    redirect_to login_path, alert: \"Acesso restrito. Faça login para continuar.\"",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        0,
+        0,
+        null,
+        0,
+        null,
+        null,
+        0,
+        null,
+        0,
+        0,
+        null,
+        0,
+        0,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 8,
+      "omitted_lines": 7,
+      "total_lines": 8,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/controllers/recargas_controller.rb": {
+      "source": [
+        "# Controller responsavel pela Issue #2 (MVP): Recarga de Saldo de Refeicoes",
+        "# Implementa regras contabeis do RU UnB e interface conforme Figma US03.",
+        "class RecargasController < ApplicationController",
+        "  before_action :autenticar_usuario!",
+        "  before_action :set_recarga, only: [ :show, :confirmar ]",
+        "",
+        "  # Tarifa oficial da refeicao fixada em centavos (R$ 4,50) para evitar imprecisao de float",
+        "  TARIFA_UNITARIA_CENTAVOS = 450",
+        "",
+        "  # GET /recargas/new",
+        "  # Renderiza a tela de compra de creditos (Figma US03)",
+        "  def new",
+        "    @usuario = current_user",
+        "    @carteira = @usuario&.carteira || @usuario&.create_carteira(saldo_centavos: 0)",
+        "    @saldo_refeicoes = (@carteira&.saldo_centavos || 0) / TARIFA_UNITARIA_CENTAVOS",
+        "    @tarifa_unitária = TARIFA_UNITARIA_CENTAVOS / 100.0",
+        "",
+        "    # Define a quantidade inicial (padrao: 5 refeicoes) ou recebe via parametro",
+        "    @quantidade = (params[:quantidade_refeicoes] || params[:pacote] || 5).to_i",
+        "    @quantidade = 5 if @quantidade <= 0",
+        "    @total_formatado = sprintf(\"%.2f\", (@quantidade * TARIFA_UNITARIA_CENTAVOS) / 100.0).tr(\".\", \",\")",
+        "    @novo_saldo_refs = @saldo_refeicoes + @quantidade",
+        "",
+        "    @recarga = Recarga.new",
+        "  end",
+        "",
+        "  # POST /recargas",
+        "  # Processa a solicitacao de compra de creditos com validacoes de negocio",
+        "  def create",
+        "    @usuario = current_user",
+        "    @carteira = @usuario.carteira",
+        "    @tarifa_unitária = TARIFA_UNITARIA_CENTAVOS / 100.0",
+        "",
+        "    metodo = params[:metodo_pagamento]",
+        "    quantidade_raw = params[:quantidade_refeicoes]",
+        "",
+        "    # 1. Validacao de presenca do metodo de pagamento",
+        "    if metodo.blank?",
+        "      flash.now[:alert] = \"Selecione uma forma de pagamento\"",
+        "      preparar_dados_view",
+        "      return render :new, status: :unprocessable_entity",
+        "    end",
+        "",
+        "    # 2. Validacao de formato numerico (aceita inteiros positivos ou negativos)",
+        "    unless quantidade_valida?(quantidade_raw)",
+        "      flash.now[:alert] = \"Informe uma quantidade numérica válida\"",
+        "      preparar_dados_view",
+        "      return render :new, status: :unprocessable_entity",
+        "    end",
+        "",
+        "    quantidade = quantidade_raw.to_i",
+        "",
+        "    # 3. Validacao dos limites de negocio (minimo 1, maximo 100 refeicoes)",
+        "    if quantidade < 1",
+        "      flash.now[:alert] = \"A quantidade mínima é de 1 refeição\"",
+        "      preparar_dados_view",
+        "      return render :new, status: :unprocessable_entity",
+        "    elsif quantidade > 100",
+        "      flash.now[:alert] = \"A quantidade máxima é de 100 refeições\"",
+        "      preparar_dados_view",
+        "      return render :new, status: :unprocessable_entity",
+        "    end",
+        "",
+        "    valor_total_centavos = quantidade * TARIFA_UNITARIA_CENTAVOS",
+        "",
+        "    # 4. Direcionamento do fluxo de acordo com a forma de pagamento escolhida",
+        "    if metodo == \"Cartão de Crédito\"",
+        "      processar_cartao(quantidade, valor_total_centavos)",
+        "    else",
+        "      processar_pix(quantidade, valor_total_centavos)",
+        "    end",
+        "  end",
+        "",
+        "  # GET /recargas/:id",
+        "  # Exibe os detalhes do PIX gerado (QR Code e chave Copia-e-Cola)",
+        "  def show",
+        "    @usuario = current_user",
+        "    @carteira = @usuario.carteira",
+        "  end",
+        "",
+        "  # POST /recargas/:id/confirmar",
+        "  # Acao que simula a liquidacao bancaria do PIX (aprovado ou expirado)",
+        "  def confirmar",
+        "    if params[:expirado] == \"true\"",
+        "      # Cenário triste: prazo expirou sem pagamento",
+        "      @recarga.update(status: \"cancelada\")",
+        "      flash[:alert] = \"Pagamento não confirmado\"",
+        "      redirect_to new_recarga_path",
+        "    else",
+        "      # Cenário feliz: transacao atomica garantindo integridade ACID",
+        "      ActiveRecord::Base.transaction do",
+        "        @recarga.update!(status: \"paga\")",
+        "        @recarga.carteira.increment!(:saldo_centavos, @recarga.valor_centavos)",
+        "      end",
+        "      flash[:notice] = \"Recarga realizada com sucesso\"",
+        "      redirect_to new_recarga_path",
+        "    end",
+        "  end",
+        "",
+        "  private",
+        "",
+        "  def set_recarga",
+        "    @recarga = current_user.recargas.find(params[:id])",
+        "  end",
+        "",
+        "  # Regex que verifica se a string informada representa um numero inteiro",
+        "  def quantidade_valida?(raw)",
+        "    return false if raw.blank?",
+        "    raw.to_s.strip.match?(/\\A-?\\d+\\z/)",
+        "  end",
+        "",
+        "  # Reconstroi o estado visual para renderizar a view caso ocorram erros de validacao",
+        "  def preparar_dados_view",
+        "    @saldo_refeicoes = (@carteira&.saldo_centavos || 0) / TARIFA_UNITARIA_CENTAVOS",
+        "    @quantidade = 5",
+        "    @total_formatado = \"22,50\"",
+        "    @novo_saldo_refs = @saldo_refeicoes + 5",
+        "    @recarga = Recarga.new",
+        "  end",
+        "",
+        "  # Processa o pagamento via cartao simulando cenarios de aprovacao e recusa",
+        "  def processar_cartao(quantidade, valor_centavos)",
+        "    cartao_status = params[:cartao_status] || \"valido\"",
+        "",
+        "    if cartao_status == \"vencido\"",
+        "      flash.now[:alert] = \"Cartão vencido\"",
+        "      preparar_dados_view",
+        "      render :new, status: :unprocessable_entity",
+        "    elsif cartao_status == \"recusado\"",
+        "      flash.now[:alert] = \"Pagamento recusado\"",
+        "      preparar_dados_view",
+        "      render :new, status: :unprocessable_entity",
+        "    else",
+        "      # Cartao valido: transacao atomica creditando a carteira imediatamente",
+        "      ActiveRecord::Base.transaction do",
+        "        @recarga = @usuario.recargas.create!(",
+        "          carteira: @carteira,",
+        "          quantidade_refeicoes: quantidade,",
+        "          valor_centavos: valor_centavos,",
+        "          status: \"paga\",",
+        "          metodo_pagamento: \"Cartão de Crédito\"",
+        "        )",
+        "        @carteira.increment!(:saldo_centavos, valor_centavos)",
+        "      end",
+        "      flash[:notice] = \"Recarga realizada com sucesso\"",
+        "      redirect_to new_recarga_path",
+        "    end",
+        "  end",
+        "",
+        "  # Cria o registro de recarga pendente com txid exclusivo e direciona para a tela do PIX",
+        "  def processar_pix(quantidade, valor_centavos)",
+        "    txid = \"PIX-#{SecureRandom.hex(8).upcase}\"",
+        "    @recarga = @usuario.recargas.create!(",
+        "      carteira: @carteira,",
+        "      quantidade_refeicoes: quantidade,",
+        "      valor_centavos: valor_centavos,",
+        "      status: \"pendente\",",
+        "      metodo_pagamento: \"PIX Instantâneo\",",
+        "      txid_pix: txid",
+        "    )",
+        "    redirect_to recarga_path(@recarga)",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        null,
+        null,
+        1,
+        1,
+        1,
+        null,
+        null,
+        1,
+        null,
+        null,
+        null,
+        1,
+        1,
+        1,
+        1,
+        1,
+        null,
+        null,
+        1,
+        1,
+        1,
+        1,
+        null,
+        1,
+        null,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0,
+        0,
+        null,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        0,
+        0,
+        null,
+        null,
+        null,
+        0,
+        0,
+        0,
+        0,
+        null,
+        null,
+        0,
+        null,
+        null,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        null,
+        null,
+        0,
+        null,
+        null,
+        0,
+        0,
+        null,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        1,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        1,
+        1,
+        null,
+        0,
+        0,
+        0,
+        null,
+        null,
+        1,
+        1,
+        1,
+        null,
+        1,
+        1,
+        null,
+        null,
+        null,
+        1,
+        null,
+        1,
+        2,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        null,
+        null,
+        null,
+        1,
+        0,
+        null,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        0,
+        null,
+        0,
+        0,
+        null,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        0,
+        null,
+        null
+      ],
+      "lines_covered_percent": 37.64705882352941,
+      "covered_lines": 32,
+      "missed_lines": 53,
+      "omitted_lines": 78,
+      "total_lines": 85,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/controllers/restaurantes_controller.rb": {
+      "source": [
+        "class RestaurantesController < ApplicationController",
+        "  include ControleDeAcesso",
+        "  before_action :exigir_administrador",
+        "  before_action :carregar_restaurante, only: %i[edit update destroy]",
+        "",
+        "  def index",
+        "    carregar_gestao",
+        "    @restaurante = Restaurante.new",
+        "    @catraca = Catraca.new",
+        "  end",
+        "",
+        "  def create",
+        "    @restaurante = Restaurante.new(restaurante_params)",
+        "    if @restaurante.save",
+        "      redirect_to restaurantes_path, notice: \"Restaurante cadastrado com sucesso\"",
+        "    else",
+        "      carregar_gestao",
+        "      @catraca = Catraca.new",
+        "      render :index, status: :unprocessable_entity",
+        "    end",
+        "  end",
+        "",
+        "  def edit; end",
+        "",
+        "  def update",
+        "    if @restaurante.update(restaurante_params)",
+        "      redirect_to restaurantes_path, notice: \"Restaurante atualizado com sucesso\"",
+        "    else",
+        "      render :edit, status: :unprocessable_entity",
+        "    end",
+        "  end",
+        "",
+        "  def destroy",
+        "    if @restaurante.destroy",
+        "      redirect_to restaurantes_path, notice: \"Restaurante removido com sucesso\"",
+        "    else",
+        "      redirect_to restaurantes_path, alert: @restaurante.errors.full_messages.to_sentence",
+        "    end",
+        "  end",
+        "",
+        "  private",
+        "",
+        "  def carregar_restaurante",
+        "    @restaurante = Restaurante.find(params[:id])",
+        "  end",
+        "",
+        "  def carregar_gestao",
+        "    @restaurantes = Restaurante.includes(:catracas).order(:nome)",
+        "  end",
+        "",
+        "  def restaurante_params",
+        "    params.require(:restaurante).permit(:nome, :campus)",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        0,
+        0,
+        0,
+        0,
+        null,
+        0,
+        0,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        0,
+        0,
+        null,
+        0,
+        0,
+        0,
+        null,
+        null,
+        null,
+        0,
+        null,
+        0,
+        0,
+        0,
+        null,
+        0,
+        null,
+        null,
+        null,
+        0,
+        0,
+        0,
+        null,
+        0,
+        null,
+        null,
+        null,
+        0,
+        null,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 31,
+      "omitted_lines": 23,
+      "total_lines": 31,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/controllers/sessions_controller.rb": {
+      "source": [
+        "class SessionsController < ApplicationController",
+        "  def new",
+        "  end",
+        "",
+        "  def create",
+        "    matricula = params[:matricula].to_s.strip",
+        "    senha = params[:password].to_s",
+        "",
+        "    if matricula.blank? || senha.blank?",
+        "      flash.now[:alert] = \"Matrícula e senha são obrigatórias\"",
+        "      return render :new, status: :unprocessable_entity",
+        "    end",
+        "",
+        "    usuario = Usuario.find_by(matricula: matricula)",
+        "",
+        "    if usuario.nil? || usuario.papel != \"funcionario\" || !usuario.authenticate(senha)",
+        "      flash.now[:alert] = \"Matrícula ou senha inválidos\"",
+        "      return render :new, status: :unprocessable_entity",
+        "    end",
+        "",
+        "    unless usuario.ativo?",
+        "      flash.now[:alert] = \"Conta de funcionário inativa\"",
+        "      return render :new, status: :unprocessable_entity",
+        "    end",
+        "",
+        "    session[:usuario_id] = usuario.id",
+        "    redirect_to painel_controle_path, notice: \"Login realizado com sucesso\"",
+        "  end",
+        "",
+        "  def destroy",
+        "    session[:usuario_id] = nil",
+        "    redirect_to login_path, notice: \"Sessão encerrada com sucesso\"",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        0,
+        null,
+        0,
+        0,
+        0,
+        null,
+        null,
+        0,
+        null,
+        0,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        null,
+        null,
+        0,
+        0,
+        0,
+        null,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 20,
+      "omitted_lines": 14,
+      "total_lines": 20,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/controllers/usuarios_controller.rb": {
+      "source": [
+        "class UsuariosController < ApplicationController",
+        "  def new",
+        "    @usuario = Usuario.new",
+        "  end",
+        "",
+        "  def create",
+        "    @usuario = Usuario.new(usuario_params)",
+        "    @usuario.papel = \"estudante\"",
+        "    @usuario.ativo = true",
+        "",
+        "    Usuario.transaction do",
+        "      @usuario.save!",
+        "      @usuario.create_carteira!(saldo_centavos: 0)",
+        "    end",
+        "",
+        "    redirect_to root_path, notice: \"Cadastro realizado com sucesso\", status: :see_other",
+        "  rescue ActiveRecord::RecordInvalid => erro",
+        "    if erro.record != @usuario",
+        "      @usuario.errors.add(:base, \"Não foi possível criar a carteira. Tente novamente.\")",
+        "    end",
+        "    render :new, status: :unprocessable_content",
+        "  end",
+        "",
+        "  private",
+        "",
+        "  def usuario_params",
+        "    params.require(:usuario).permit(:nome, :matricula, :email, :password, :password_confirmation)",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        1,
+        null,
+        null,
+        1,
+        10,
+        10,
+        10,
+        null,
+        10,
+        10,
+        2,
+        null,
+        null,
+        1,
+        null,
+        9,
+        1,
+        null,
+        9,
+        null,
+        null,
+        1,
+        null,
+        1,
+        10,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 17,
+      "missed_lines": 0,
+      "omitted_lines": 12,
+      "total_lines": 17,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/helpers/application_helper.rb": {
+      "source": [
+        "module ApplicationHelper",
+        "end"
+      ],
+      "lines": [
+        1,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 1,
+      "missed_lines": 0,
+      "omitted_lines": 1,
+      "total_lines": 1,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/helpers/extratos_helper.rb": {
+      "source": [
+        "# frozen_string_literal: true",
+        "",
+        "module ExtratosHelper",
+        "end"
+      ],
+      "lines": [
+        null,
+        null,
+        1,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 1,
+      "missed_lines": 0,
+      "omitted_lines": 3,
+      "total_lines": 1,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/helpers/home_helper.rb": {
+      "source": [
+        "module HomeHelper",
+        "end"
+      ],
+      "lines": [
+        1,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 1,
+      "missed_lines": 0,
+      "omitted_lines": 1,
+      "total_lines": 1,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/helpers/recargas_helper.rb": {
+      "source": [
+        "module RecargasHelper",
+        "end"
+      ],
+      "lines": [
+        1,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 1,
+      "missed_lines": 0,
+      "omitted_lines": 1,
+      "total_lines": 1,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/jobs/application_job.rb": {
+      "source": [
+        "class ApplicationJob < ActiveJob::Base",
+        "  # Automatically retry jobs that encountered a deadlock",
+        "  # retry_on ActiveRecord::Deadlocked",
+        "",
+        "  # Most jobs are safe to ignore if the underlying records are no longer available",
+        "  # discard_on ActiveJob::DeserializationError",
+        "end"
+      ],
+      "lines": [
+        1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 1,
+      "missed_lines": 0,
+      "omitted_lines": 6,
+      "total_lines": 1,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/jobs/notificar_fastpass_job.rb": {
+      "source": [
+        "class NotificarFastpassJob < ApplicationJob",
+        "  queue_as :default",
+        "",
+        "  def perform",
+        "    NotificarResultadoFastpass.call",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        null,
+        1,
+        1,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 4,
+      "missed_lines": 0,
+      "omitted_lines": 3,
+      "total_lines": 4,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/mailers/application_mailer.rb": {
+      "source": [
+        "class ApplicationMailer < ActionMailer::Base",
+        "  default from: \"from@example.com\"",
+        "  layout \"mailer\"",
+        "end"
+      ],
+      "lines": [
+        0,
+        0,
+        0,
+        null
+      ],
+      "lines_covered_percent": 0.0,
+      "covered_lines": 0,
+      "missed_lines": 3,
+      "omitted_lines": 1,
+      "total_lines": 3,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/models/acesso.rb": {
+      "source": [
+        "class Acesso < ApplicationRecord",
+        "  belongs_to :usuario",
+        "  belongs_to :catraca",
+        "  belongs_to :turno",
+        "  has_one :avaliacao, dependent: :destroy",
+        "",
+        "  validates :data_hora, presence: true",
+        "  validates :valor_pago_centavos, numericality: { greater_than_or_equal_to: 0 }",
+        "  validates :forma_acesso, presence: true",
+        "",
+        "  def aguardando_passagem?",
+        "    autorizado? && valor_pago_centavos.to_i.zero? && motivo_recusa.nil?",
+        "  end",
+        "",
+        "  # Débito da refeição no momento da passagem pela catraca.",
+        "  def confirmar_passagem!",
+        "    carteira = usuario.carteira",
+        "    preco = turno.valor_refeicao_centavos",
+        "    return false unless aguardando_passagem? && carteira && carteira.saldo_centavos >= preco",
+        "",
+        "    transaction do",
+        "      carteira.update!(saldo_centavos: carteira.saldo_centavos - preco)",
+        "      update!(valor_pago_centavos: preco, data_hora: Time.current)",
+        "    end",
+        "    true",
+        "  end",
+        "",
+        "  def encerrar_sem_passagem!",
+        "    return false unless aguardando_passagem?",
+        "",
+        "    update!(autorizado: false, motivo_recusa: \"Passagem não confirmada\")",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        null,
+        1,
+        1,
+        1,
+        null,
+        1,
+        18,
+        null,
+        null,
+        null,
+        1,
+        6,
+        6,
+        6,
+        null,
+        3,
+        3,
+        3,
+        null,
+        3,
+        null,
+        null,
+        1,
+        4,
+        null,
+        3,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 21,
+      "missed_lines": 0,
+      "omitted_lines": 12,
+      "total_lines": 21,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/models/application_record.rb": {
+      "source": [
+        "class ApplicationRecord < ActiveRecord::Base",
+        "  primary_abstract_class",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 2,
+      "missed_lines": 0,
+      "omitted_lines": 1,
+      "total_lines": 2,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/models/avaliacao.rb": {
+      "source": [
+        "class Avaliacao < ApplicationRecord",
+        "  belongs_to :usuario",
+        "  belongs_to :acesso",
+        "",
+        "  validates :nota, presence: true, inclusion: { in: 1..5 }",
+        "  validates :acesso_id, uniqueness: true",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        1,
+        null,
+        1,
+        1,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 5,
+      "missed_lines": 0,
+      "omitted_lines": 2,
+      "total_lines": 5,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/models/cardapio.rb": {
+      "source": [
+        "class Cardapio < ApplicationRecord",
+        "  belongs_to :restaurante",
+        "  belongs_to :turno",
+        "  has_many :itens_cardapio, dependent: :destroy",
+        "",
+        "  validates :data_refeicao, presence: true",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        1,
+        1,
+        null,
+        1,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 5,
+      "missed_lines": 0,
+      "omitted_lines": 2,
+      "total_lines": 5,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/models/carteira.rb": {
+      "source": [
+        "class Carteira < ApplicationRecord",
+        "  belongs_to :usuario",
+        "  has_many :recargas, dependent: :destroy",
+        "",
+        "  validates :saldo_centavos, numericality: { greater_than_or_equal_to: 0 }",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        1,
+        null,
+        1,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 4,
+      "missed_lines": 0,
+      "omitted_lines": 2,
+      "total_lines": 4,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/models/catraca.rb": {
+      "source": [
+        "class Catraca < ApplicationRecord",
+        "  belongs_to :restaurante, optional: true",
+        "  has_many :acessos, dependent: :destroy",
+        "",
+        "  before_validation { self.status = \"ativa\" if status.blank? }",
+        "",
+        "  validates :status, presence: true",
+        "  validate :validar_restaurante_e_identificador",
+        "",
+        "  private",
+        "",
+        "  def validar_restaurante_e_identificador",
+        "    errors.add(:base, \"Selecione um restaurante\") if restaurante.blank?",
+        "",
+        "    if codigo_identificador.blank?",
+        "      errors.add(:base, \"Identificador não pode ficar em branco\")",
+        "    elsif Catraca.where.not(id: id).exists?(codigo_identificador: codigo_identificador)",
+        "      errors.add(:base, \"Já existe uma catraca com este identificador\")",
+        "    end",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        1,
+        null,
+        43,
+        null,
+        1,
+        1,
+        null,
+        1,
+        null,
+        1,
+        42,
+        null,
+        42,
+        1,
+        41,
+        1,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 13,
+      "missed_lines": 0,
+      "omitted_lines": 8,
+      "total_lines": 13,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/models/inscricao_fastpass.rb": {
+      "source": [
+        "class InscricaoFastpass < ApplicationRecord",
+        "  belongs_to :sorteio_fastpass",
+        "  belongs_to :usuario",
+        "",
+        "  validates :status, presence: true",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        1,
+        null,
+        1,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 4,
+      "missed_lines": 0,
+      "omitted_lines": 2,
+      "total_lines": 4,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/models/item_cardapio.rb": {
+      "source": [
+        "class ItemCardapio < ApplicationRecord",
+        "  belongs_to :cardapio",
+        "",
+        "  validates :categoria, :descricao, presence: true",
+        "",
+        "  OPCOES = {",
+        "    \"padrao\" => \"Opção Padrão\",",
+        "    \"ovolactovegetariano\" => \"Opção Ovolactovegetariana\",",
+        "    \"vegetariano_estrito\" => \"Opção Vegetariana Estrita\"",
+        "  }.freeze",
+        "",
+        "  def opcao",
+        "    OPCOES.keys.find { |chave| categoria.to_s.end_with?(\"_#{chave}\") }",
+        "  end",
+        "",
+        "  def tipo",
+        "    categoria.to_s.start_with?(\"complemento\") ? \"Complemento\" : \"Prato principal\"",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        null,
+        1,
+        null,
+        null,
+        1,
+        null,
+        null,
+        null,
+        null,
+        1,
+        29,
+        null,
+        null,
+        1,
+        5,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 8,
+      "missed_lines": 0,
+      "omitted_lines": 11,
+      "total_lines": 8,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/models/notificacao.rb": {
+      "source": [
+        "class Notificacao < ApplicationRecord",
+        "  belongs_to :usuario",
+        "  belongs_to :sorteio_fastpass, optional: true",
+        "",
+        "  validates :titulo, :mensagem, :tipo, :status_envio, presence: true",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        1,
+        null,
+        1,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 4,
+      "missed_lines": 0,
+      "omitted_lines": 2,
+      "total_lines": 4,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/models/recarga.rb": {
+      "source": [
+        "class Recarga < ApplicationRecord",
+        "  belongs_to :usuario",
+        "  belongs_to :carteira",
+        "",
+        "  validates :quantidade_refeicoes, :valor_centavos, :status, :metodo_pagamento, presence: true",
+        "  validates :valor_centavos, numericality: { greater_than: 0 }",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        1,
+        null,
+        1,
+        1,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 5,
+      "missed_lines": 0,
+      "omitted_lines": 2,
+      "total_lines": 5,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/models/restaurante.rb": {
+      "source": [
+        "class Restaurante < ApplicationRecord",
+        "  has_many :catracas",
+        "  has_many :cardapios, dependent: :destroy",
+        "",
+        "  before_validation { self.ativo = true if ativo.nil? }",
+        "  before_destroy :nao_remover_com_catracas, prepend: true",
+        "",
+        "  validates :nome, presence: { message: \"não pode ficar em branco\" }",
+        "  validate :nome_unico",
+        "",
+        "  private",
+        "",
+        "  def nome_unico",
+        "    return if nome.blank?",
+        "",
+        "    outros = Restaurante.where(\"LOWER(nome) = ?\", nome.strip.downcase)",
+        "    outros = outros.where.not(id: id) if persisted?",
+        "    errors.add(:base, \"Já existe um restaurante com este nome\") if outros.exists?",
+        "  end",
+        "",
+        "  def nao_remover_com_catracas",
+        "    return unless catracas.exists?",
+        "",
+        "    errors.add(:base, \"Remova as catracas deste restaurante antes de excluí-lo\")",
+        "    throw :abort",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        1,
+        null,
+        54,
+        1,
+        null,
+        1,
+        1,
+        null,
+        1,
+        null,
+        1,
+        53,
+        null,
+        52,
+        52,
+        52,
+        null,
+        null,
+        1,
+        2,
+        null,
+        1,
+        1,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 17,
+      "missed_lines": 0,
+      "omitted_lines": 10,
+      "total_lines": 17,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/models/sorteio_fastpass.rb": {
+      "source": [
+        "class SorteioFastpass < ApplicationRecord",
+        "  belongs_to :turno",
+        "  has_many :inscricoes_fastpass, dependent: :destroy",
+        "  has_many :notificacoes, dependent: :destroy",
+        "",
+        "  validates :data_sorteio, :status, :vagas_disponiveis, presence: true",
+        "  validates :vagas_disponiveis, numericality: { greater_than_or_equal_to: 0 }",
+        "  # A data do sorteio representa o dia do turno ao qual o resultado se refere.",
+        "  def horario_fastpass",
+        "    horario = turno.horario_inicio.utc",
+        "    Time.use_zone(\"America/Sao_Paulo\") do",
+        "      Time.zone.local(data_sorteio.year, data_sorteio.month, data_sorteio.day,",
+        "        horario.hour, horario.min, horario.sec)",
+        "    end",
+        "  end",
+        "",
+        "  def horario_notificacao",
+        "    horario_fastpass - 1.hour",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        1,
+        1,
+        null,
+        1,
+        1,
+        null,
+        1,
+        28,
+        28,
+        28,
+        null,
+        null,
+        null,
+        null,
+        1,
+        24,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 12,
+      "missed_lines": 0,
+      "omitted_lines": 8,
+      "total_lines": 12,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/models/turno.rb": {
+      "source": [
+        "class Turno < ApplicationRecord",
+        "  has_many :cardapios, dependent: :destroy",
+        "  has_many :acessos, dependent: :destroy",
+        "  has_many :sorteios_fastpass, dependent: :destroy",
+        "",
+        "  validates :nome, :horario_inicio, :horario_fim, presence: true",
+        "  validates :valor_refeicao_centavos, numericality: { greater_than: 0 }",
+        "",
+        "  # Turno que está sendo servido no momento informado (horário de Brasília).",
+        "  def self.em_atendimento(momento = Time.current)",
+        "    hora = momento.in_time_zone(\"America/Sao_Paulo\").strftime(\"%H:%M\")",
+        "    all.find { |turno| hora >= turno.horario_inicio.strftime(\"%H:%M\") && hora < turno.horario_fim.strftime(\"%H:%M\") }",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        1,
+        1,
+        null,
+        1,
+        1,
+        null,
+        null,
+        1,
+        28,
+        58,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 9,
+      "missed_lines": 0,
+      "omitted_lines": 5,
+      "total_lines": 9,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/models/usuario.rb": {
+      "source": [
+        "class Usuario < ApplicationRecord",
+        "  has_secure_password",
+        "",
+        "  has_one :carteira, dependent: :destroy",
+        "  has_many :recargas, dependent: :destroy",
+        "  has_many :acessos, dependent: :destroy",
+        "  has_many :avaliacoes, dependent: :destroy",
+        "  has_many :inscricoes_fastpass, dependent: :destroy",
+        "  has_many :notificacoes, dependent: :destroy",
+        "",
+        "  validates :matricula, presence: { message: \"Matrícula não pode ficar em branco\" },",
+        "    uniqueness: { message: \"Matrícula já cadastrada\" }",
+        "  validates :matricula, format: { with: /\\A[0-9]+\\z/, message: \"Matrícula deve conter apenas números\" },",
+        "    length: { is: 9, message: \"Matrícula deve ter 9 dígitos\" }, allow_blank: true",
+        "  validates :email, presence: true, uniqueness: true",
+        "  validates :nome, presence: { message: \"Nome é obrigatório\" }",
+        "  validates :password, presence: { message: \"Senha é obrigatória\" }, on: :create",
+        "  validates :password, length: { minimum: 8, message: \"Senha deve ter no mínimo 8 caracteres\" },",
+        "    allow_blank: true",
+        "  validates :papel, presence: true",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        null,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        null,
+        1,
+        null,
+        1,
+        null,
+        1,
+        1,
+        1,
+        1,
+        null,
+        1,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 15,
+      "missed_lines": 0,
+      "omitted_lines": 6,
+      "total_lines": 15,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/services/extrato_pdf_generator.rb": {
+      "source": [
+        "# frozen_string_literal: true",
+        "",
+        "require \"prawn\"",
+        "",
+        "# ==============================================================================",
+        "# Service Gerador de PDF do Extrato (app/services/extrato_pdf_generator.rb)",
+        "# ==============================================================================",
+        "# Constrói o extrato oficial e timbrado em formato PDF utilizando a gem Prawn.",
+        "# O documento contém:",
+        "# 1. Cabeçalho Institucional (UnB / RU Digital)",
+        "# 2. Dados do Estudante e Saldo Atual",
+        "# 3. Quadro de Resumo Contábil (Total Gasto, Refeições Realizadas e Total Recarregado)",
+        "# 4. Tabela Zebrada de Lançamentos (Data/Hora, Evento, Restaurante, Acesso e Valor)",
+        "# 5. Rodapé Institucional com timestamp de emissão",
+        "# ==============================================================================",
+        "class ExtratoPdfGenerator",
+        "  Prawn::Fonts::AFM.hide_m17n_warning = true if defined?(Prawn::Fonts::AFM)",
+        "",
+        "  attr_reader :usuario, :extrato_service, :lancamentos",
+        "",
+        "  def initialize(usuario:, extrato_service:)",
+        "    @usuario = usuario",
+        "    @extrato_service = extrato_service",
+        "    @lancamentos = extrato_service.lancamentos",
+        "  end",
+        "",
+        "  # Gera o binário do PDF renderizado",
+        "  def gerar",
+        "    pdf = Prawn::Document.new(",
+        "      page_size: \"A4\",",
+        "      margin: [ 36, 36, 36, 36 ],",
+        "      compress: false",
+        "    )",
+        "",
+        "    desenhar_cabecalho(pdf)",
+        "    desenhar_dados_estudante(pdf)",
+        "    desenhar_quadro_resumo(pdf)",
+        "    desenhar_tabela_lancamentos(pdf)",
+        "    desenhar_rodape(pdf)",
+        "",
+        "    pdf.render",
+        "  end",
+        "",
+        "  private",
+        "",
+        "  # 1. Cabeçalho Institucional com brasão textual da UnB",
+        "  def desenhar_cabecalho(pdf)",
+        "    pdf.fill_color \"044B2C\"",
+        "    pdf.text normalizar(\"UNIVERSIDADE DE BRASÍLIA — UnB\"), size: 14, style: :bold, align: :center",
+        "    pdf.fill_color \"1E293B\"",
+        "    pdf.text normalizar(\"Diretoria de Desenvolvimento Social — Restaurante Universitário\"), size: 10, align: :center",
+        "    pdf.text normalizar(\"PORTAL DO ESTUDANTE | EXTRATO E HISTÓRICO DE REFEIÇÕES\"), size: 9, style: :bold, align: :center, color: \"0284C7\"",
+        "    pdf.move_down 10",
+        "    pdf.stroke_color \"E2E8F0\"",
+        "    pdf.stroke_horizontal_rule",
+        "    pdf.move_down 12",
+        "  end",
+        "",
+        "  # 2. Dados Cadastrais do Estudante e Saldo",
+        "  def desenhar_dados_estudante(pdf)",
+        "    pdf.fill_color \"0F172A\"",
+        "    pdf.text normalizar(\"DADOS DO ESTUDANTE\"), size: 10, style: :bold",
+        "    pdf.move_down 4",
+        "",
+        "    pdf.font_size 9 do",
+        "      pdf.text normalizar(\"Nome: #{@usuario.nome}  |  Matrícula: #{@usuario.matricula}  |  E-mail: #{@usuario.email}\")",
+        "      pdf.text normalizar(\"Data de Emissão: #{Time.current.strftime('%d/%m/%Y às %H:%M')}  |  Saldo Atual: #{extrato_service.saldo_atual_formatado} (#{extrato_service.saldo_atual_refeicoes} refeições)\")",
+        "    end",
+        "",
+        "    pdf.move_down 10",
+        "    pdf.stroke_horizontal_rule",
+        "    pdf.move_down 10",
+        "  end",
+        "",
+        "  # 3. Quadro de Resumo Contábil (Total Gasto, Refeições Realizadas, Total Recarregado)",
+        "  def desenhar_quadro_resumo(pdf)",
+        "    pdf.fill_color \"0F172A\"",
+        "    pdf.text normalizar(\"RESUMO DO PERÍODO\"), size: 10, style: :bold",
+        "    pdf.move_down 6",
+        "",
+        "    # Texto legível e direto para atender às asserções do BDD",
+        "    total_gasto = extrato_service.total_gasto_formatado",
+        "    refeicoes = \"#{extrato_service.refeicoes_realizadas_count} refeicoes\"",
+        "    recarregado = extrato_service.total_recarregado_formatado",
+        "",
+        "    pdf.fill_color \"F8FAFC\"",
+        "    pdf.fill_rounded_rectangle [ 0, pdf.cursor ], 523, 38, 4",
+        "    pdf.fill_color \"1E293B\"",
+        "",
+        "    pdf.bounding_box([ 10, pdf.cursor - 8 ], width: 503, height: 26) do",
+        "      pdf.font_size 9 do",
+        "        texto_resumo = normalizar(\"Total Gasto: #{total_gasto}    |    Refeições Realizadas: #{refeicoes}    |    Total Recarregado: #{recarregado}\")",
+        "        pdf.text texto_resumo, style: :bold",
+        "      end",
+        "    end",
+        "",
+        "    pdf.move_down 12",
+        "    pdf.stroke_horizontal_rule",
+        "    pdf.move_down 10",
+        "  end",
+        "",
+        "  # 4. Tabela de Lançamentos Formatada",
+        "  def desenhar_tabela_lancamentos(pdf)",
+        "    pdf.fill_color \"0F172A\"",
+        "    pdf.text \"LANCAMENTOS REGISTRADOS (#{lancamentos.size})\", size: 10, style: :bold",
+        "    pdf.move_down 6",
+        "",
+        "    # Cabeçalho da Tabela",
+        "    y_pos = pdf.cursor",
+        "    pdf.fill_color \"F1F5F9\"",
+        "    pdf.fill_rectangle [ 0, y_pos ], 523, 18",
+        "    pdf.fill_color \"334155\"",
+        "",
+        "    pdf.font_size 8 do",
+        "      pdf.draw_text normalizar(\"Data e Hora\"), at: [ 6, y_pos - 13 ], style: :bold",
+        "      pdf.draw_text normalizar(\"Refeição ou Evento\"), at: [ 115, y_pos - 13 ], style: :bold",
+        "      pdf.draw_text normalizar(\"Restaurante\"), at: [ 235, y_pos - 13 ], style: :bold",
+        "      pdf.draw_text normalizar(\"Método de Acesso\"), at: [ 350, y_pos - 13 ], style: :bold",
+        "      pdf.draw_text normalizar(\"Valor\"), at: [ 480, y_pos - 13 ], style: :bold",
+        "    end",
+        "",
+        "    pdf.move_down 20",
+        "",
+        "    # Linhas dos Lançamentos",
+        "    lancamentos.each_with_index do |lancamento, idx|",
+        "      # Quebra de página automática quando atinge a margem inferior",
+        "      if pdf.cursor < 40",
+        "        pdf.start_new_page",
+        "        pdf.move_down 10",
+        "      end",
+        "",
+        "      y = pdf.cursor",
+        "",
+        "      # Efeito zebrado sutil nas linhas pares",
+        "      if idx.even?",
+        "        pdf.fill_color \"FAFAFA\"",
+        "        pdf.fill_rectangle [ 0, y ], 523, 16",
+        "      end",
+        "",
+        "      # Cor do valor: verde para créditos (+) e neutro/escuro para débitos (-)",
+        "      pdf.fill_color \"1E293B\"",
+        "      pdf.font_size 8 do",
+        "        pdf.draw_text normalizar(lancamento.data_formatada), at: [ 6, y - 11 ]",
+        "        pdf.draw_text normalizar(lancamento.evento), at: [ 115, y - 11 ]",
+        "        pdf.draw_text normalizar(lancamento.restaurante), at: [ 235, y - 11 ]",
+        "        pdf.draw_text normalizar(lancamento.forma_acesso), at: [ 350, y - 11 ]",
+        "",
+        "        if lancamento.credito?",
+        "          pdf.fill_color \"16A34A\"",
+        "        else",
+        "          pdf.fill_color \"0F172A\"",
+        "        end",
+        "        pdf.draw_text normalizar(lancamento.valor_formatado), at: [ 465, y - 11 ], style: :bold",
+        "      end",
+        "",
+        "      pdf.move_down 16",
+        "    end",
+        "  end",
+        "",
+        "  # Normaliza caracteres para a fonte padrão AFM do Prawn",
+        "  def normalizar(str)",
+        "    str.to_s.tr(\"áàãâéêíóôõúçÁÀÃÂÉÊÍÓÔÕÚÇ\", \"aaaaeeioooucAAAAEEIOOOUC\")",
+        "  end",
+        "",
+        "  # 5. Rodapé de Autenticação e Segurança",
+        "  def desenhar_rodape(pdf)",
+        "    pdf.move_down 15",
+        "    pdf.stroke_color \"E2E8F0\"",
+        "    pdf.stroke_horizontal_rule",
+        "    pdf.move_down 6",
+        "",
+        "    pdf.font_size 7 do",
+        "      pdf.fill_color \"94A3B8\"",
+        "      pdf.text \"Documento oficial gerado eletronicamente pelo Sistema RU Digital — Universidade de Brasília.\", align: :center",
+        "      pdf.text \"Autenticidade: SHA256-#{SecureRandom.hex(16).upcase} | Emitido para Matrícula #{@usuario.matricula}\", align: :center",
+        "    end",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        null,
+        null,
+        1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        1,
+        1,
+        null,
+        1,
+        null,
+        1,
+        1,
+        1,
+        1,
+        null,
+        null,
+        null,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        1,
+        1,
+        1,
+        1,
+        1,
+        null,
+        1,
+        null,
+        null,
+        1,
+        null,
+        null,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        null,
+        null,
+        null,
+        1,
+        1,
+        1,
+        1,
+        null,
+        1,
+        1,
+        1,
+        null,
+        null,
+        1,
+        1,
+        1,
+        null,
+        null,
+        null,
+        1,
+        1,
+        1,
+        1,
+        null,
+        null,
+        1,
+        1,
+        1,
+        null,
+        1,
+        1,
+        1,
+        null,
+        1,
+        1,
+        1,
+        1,
+        null,
+        null,
+        null,
+        1,
+        1,
+        1,
+        null,
+        null,
+        null,
+        1,
+        1,
+        1,
+        1,
+        null,
+        null,
+        1,
+        1,
+        1,
+        1,
+        null,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        null,
+        null,
+        1,
+        null,
+        null,
+        1,
+        null,
+        2,
+        0,
+        0,
+        null,
+        null,
+        2,
+        null,
+        null,
+        2,
+        1,
+        1,
+        null,
+        null,
+        null,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        null,
+        2,
+        1,
+        null,
+        1,
+        null,
+        2,
+        null,
+        null,
+        2,
+        null,
+        null,
+        null,
+        null,
+        1,
+        23,
+        null,
+        null,
+        null,
+        1,
+        1,
+        1,
+        1,
+        1,
+        null,
+        1,
+        1,
+        1,
+        1,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 97.97979797979798,
+      "covered_lines": 97,
+      "missed_lines": 2,
+      "omitted_lines": 79,
+      "total_lines": 99,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/services/extrato_service.rb": {
+      "source": [
+        "# frozen_string_literal: true",
+        "",
+        "# ==============================================================================",
+        "# Service de Consolidação Contábil do Extrato (app/services/extrato_service.rb)",
+        "# ==============================================================================",
+        "# Responsável por unificar, em tempo de execução e conforme a 3FN do banco,",
+        "# as movimentações financeiras do estudante:",
+        "# - Créditos: Recargas pagas (status == 'paga')",
+        "# - Débitos: Acessos autorizados aos restaurantes (autorizado == true)",
+        "#",
+        "# Aplica filtros de período, tipo de refeição/evento e forma de acesso,",
+        "# calculando ainda os agregadores dos cards do Figma US04.",
+        "# ==============================================================================",
+        "class ExtratoService",
+        "  # Estrutura unificada representando um lançamento contábil no extrato",
+        "  Lancamento = Struct.new(",
+        "    :id,",
+        "    :tipo_registro, # :recarga ou :acesso",
+        "    :data_hora,     # DateTime",
+        "    :evento,        # \"Recarga de Saldo\", \"Almoço\", \"Jantar\", \"Café da Manhã\"",
+        "    :restaurante,   # \"RU Darcy Ribeiro\", \"Portal Online\"",
+        "    :forma_acesso,  # \"QR Code App\", \"Carteirinha Física\", \"PIX Instantâneo\", \"Cartão de Crédito\"",
+        "    :tipo_fluxo,    # :credito (+) ou :debito (-)",
+        "    :valor_centavos # integer",
+        "  ) do",
+        "    # Formata o valor monetário com sinal e padrão brasileiro (ex: \"+ R$ 45,00\" ou \"- R$ 4,50\")",
+        "    def valor_formatado",
+        "      reais = valor_centavos / 100.0",
+        "      sinal = credito? ? \"+\" : \"-\"",
+        "      \"#{sinal} R$ #{sprintf('%.2f', reais).tr('.', ',')}\"",
+        "    end",
+        "",
+        "    def credito?",
+        "      tipo_fluxo == :credito",
+        "    end",
+        "",
+        "    def debito?",
+        "      tipo_fluxo == :debito",
+        "    end",
+        "",
+        "    def data_formatada",
+        "      data_hora.strftime(\"%d/%m/%Y às %H:%M\")",
+        "    end",
+        "  end",
+        "",
+        "  attr_reader :usuario, :filtros",
+        "",
+        "  def initialize(usuario, filtros = {})",
+        "    @usuario = usuario",
+        "    @filtros = filtros.to_h.symbolize_keys",
+        "  end",
+        "",
+        "  # Retorna a lista consolidada e filtrada de lançamentos ordenada do mais recente ao mais antigo",
+        "  def lancamentos",
+        "    @lancamentos ||= consolidar_lancamentos",
+        "  end",
+        "",
+        "  # Indicador 1: Total gasto em acessos autorizados no mês atual (ou no período filtrado)",
+        "  def total_gasto_centavos",
+        "    lancamentos.select(&:debito?).sum(&:valor_centavos)",
+        "  end",
+        "",
+        "  def total_gasto_formatado",
+        "    formatar_moeda(total_gasto_centavos)",
+        "  end",
+        "",
+        "  # Indicador 2: Quantidade de refeições consumidas (acessos) no período",
+        "  def refeicoes_realizadas_count",
+        "    lancamentos.select(&:debito?).size",
+        "  end",
+        "",
+        "  # Indicador 3: Total recarregado em dinheiro no período",
+        "  def total_recarregado_centavos",
+        "    lancamentos.select(&:credito?).sum(&:valor_centavos)",
+        "  end",
+        "",
+        "  def total_recarregado_formatado",
+        "    formatar_moeda(total_recarregado_centavos)",
+        "  end",
+        "",
+        "  # Saldo atual da carteira do estudante",
+        "  def saldo_atual_formatado",
+        "    saldo = @usuario.carteira&.saldo_centavos || 0",
+        "    formatar_moeda(saldo)",
+        "  end",
+        "",
+        "  def saldo_atual_refeicoes",
+        "    saldo = @usuario.carteira&.saldo_centavos || 0",
+        "    saldo / 450",
+        "  end",
+        "",
+        "  private",
+        "",
+        "  # Unifica recargas e acessos em memória e aplica os filtros ativos",
+        "  def consolidar_lancamentos",
+        "    lista = []",
+        "",
+        "    # 1. Carrega recargas pagas do estudante",
+        "    usuario.recargas.where(status: \"paga\").find_each do |recarga|",
+        "      lista << Lancamento.new(",
+        "        \"recarga-#{recarga.id}\",",
+        "        :recarga,",
+        "        recarga.created_at,",
+        "        \"Recarga de Saldo\",",
+        "        \"Portal Online\",",
+        "        recarga.metodo_pagamento || \"PIX Instantâneo\",",
+        "        :credito,",
+        "        recarga.valor_centavos",
+        "      )",
+        "    end",
+        "",
+        "    # 2. Carrega acessos autorizados do estudante",
+        "    usuario.acessos.where(autorizado: true).includes(:turno, catraca: :restaurante).find_each do |acesso|",
+        "      turno_nome = acesso.turno&.nome || \"Refeição\"",
+        "      restaurante_nome = formatar_restaurante(acesso.catraca&.restaurante)",
+        "      forma = acesso.forma_acesso.presence || \"QR Code App\"",
+        "",
+        "      lista << Lancamento.new(",
+        "        \"acesso-#{acesso.id}\",",
+        "        :acesso,",
+        "        acesso.data_hora || acesso.created_at,",
+        "        turno_nome,",
+        "        restaurante_nome,",
+        "        forma,",
+        "        :debito,",
+        "        acesso.valor_pago_centavos || 450",
+        "      )",
+        "    end",
+        "",
+        "    # 3. Ordena por data decrescente",
+        "    lista.sort_by! { |l| l.data_hora || Time.zone.at(0) }.reverse!",
+        "",
+        "    # 4. Aplica os filtros recebidos por parâmetro",
+        "    aplicar_filtros(lista)",
+        "  end",
+        "",
+        "  def aplicar_filtros(lista)",
+        "    resultado = lista",
+        "",
+        "    # Filtro: Período de Referência",
+        "    if filtros[:periodo].present?",
+        "      case filtros[:periodo].to_s.downcase",
+        "      when /30/",
+        "        data_limite = 30.days.ago.beginning_of_day",
+        "        resultado = resultado.select { |l| l.data_hora && l.data_hora >= data_limite }",
+        "      when /7/",
+        "        data_limite = 7.days.ago.beginning_of_day",
+        "        resultado = resultado.select { |l| l.data_hora && l.data_hora >= data_limite }",
+        "      when /m[eê]s/",
+        "        data_limite = Time.current.beginning_of_month",
+        "        resultado = resultado.select { |l| l.data_hora && l.data_hora >= data_limite }",
+        "      end",
+        "    end",
+        "",
+        "    # Filtro: Tipo de Refeição / Evento",
+        "    if filtros[:tipo_refeicao].present? && filtros[:tipo_refeicao] != \"Todas\"",
+        "      tipo = filtros[:tipo_refeicao].to_s.downcase",
+        "      resultado = resultado.select do |l|",
+        "        if tipo.include?(\"recarga\")",
+        "          l.credito?",
+        "        else",
+        "          l.evento.to_s.downcase.include?(tipo)",
+        "        end",
+        "      end",
+        "    end",
+        "",
+        "    # Filtro: Forma de Acesso",
+        "    if filtros[:forma_acesso].present? && filtros[:forma_acesso] != \"Todas\"",
+        "      forma = filtros[:forma_acesso].to_s.downcase",
+        "      resultado = resultado.select do |l|",
+        "        l.forma_acesso.to_s.downcase.include?(forma)",
+        "      end",
+        "    end",
+        "",
+        "    resultado",
+        "  end",
+        "",
+        "  # Simplifica o nome do restaurante removendo prefixos longos (ex: \"Restaurante Universitário - \")",
+        "  def formatar_restaurante(restaurante)",
+        "    return \"Darcy Ribeiro\" unless restaurante",
+        "",
+        "    nome = restaurante.campus.presence || restaurante.nome.to_s",
+        "    nome.sub(/\\A(Restaurante\\s+Universit[aá]rio\\s*-\\s*|RU\\s*-\\s*|RU\\s+)/i, \"\").strip",
+        "  end",
+        "",
+        "  def formatar_moeda(centavos)",
+        "    reais = (centavos || 0) / 100.0",
+        "    \"R$ #{sprintf('%.2f', reais).tr('.', ',')}\"",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        1,
+        null,
+        1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        1,
+        2,
+        2,
+        2,
+        null,
+        null,
+        1,
+        6,
+        null,
+        null,
+        1,
+        4,
+        null,
+        null,
+        1,
+        2,
+        null,
+        null,
+        null,
+        1,
+        null,
+        1,
+        3,
+        3,
+        null,
+        null,
+        null,
+        1,
+        10,
+        null,
+        null,
+        null,
+        1,
+        2,
+        null,
+        null,
+        1,
+        2,
+        null,
+        null,
+        null,
+        1,
+        2,
+        null,
+        null,
+        null,
+        1,
+        2,
+        null,
+        null,
+        1,
+        2,
+        null,
+        null,
+        null,
+        1,
+        2,
+        2,
+        null,
+        null,
+        1,
+        2,
+        2,
+        null,
+        null,
+        1,
+        null,
+        null,
+        1,
+        3,
+        null,
+        null,
+        3,
+        1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        3,
+        1,
+        1,
+        1,
+        null,
+        1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        5,
+        null,
+        null,
+        3,
+        null,
+        null,
+        1,
+        3,
+        null,
+        null,
+        3,
+        0,
+        null,
+        0,
+        0,
+        null,
+        0,
+        0,
+        null,
+        0,
+        0,
+        null,
+        null,
+        null,
+        null,
+        3,
+        0,
+        0,
+        0,
+        0,
+        null,
+        0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        3,
+        0,
+        0,
+        0,
+        null,
+        null,
+        null,
+        3,
+        null,
+        null,
+        null,
+        1,
+        1,
+        null,
+        1,
+        1,
+        null,
+        null,
+        1,
+        6,
+        6,
+        null,
+        null
+      ],
+      "lines_covered_percent": 79.72972972972973,
+      "covered_lines": 59,
+      "missed_lines": 15,
+      "omitted_lines": 116,
+      "total_lines": 74,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    },
+    "app/services/notificar_resultado_fastpass.rb": {
+      "source": [
+        "class NotificarResultadoFastpass",
+        "  def self.call(agora: Time.current)",
+        "    agora = agora.in_time_zone(\"America/Sao_Paulo\")",
+        "    SorteioFastpass.where(status: \"realizado\", data_sorteio: agora.to_date..(agora.to_date + 1)).find_each do |sorteio|",
+        "      programado = sorteio.horario_notificacao",
+        "      next unless agora >= programado && agora < programado + 1.minute",
+        "",
+        "      sorteio.with_lock do",
+        "        next unless sorteio.status == \"realizado\"",
+        "",
+        "        sorteio.inscricoes_fastpass.includes(:usuario).find_each do |inscricao|",
+        "          next unless inscricao.usuario.papel == \"estudante\"",
+        "          next unless [ \"sorteado\", \"nao_sorteado\" ].include?(inscricao.status)",
+        "",
+        "          sorteio.notificacoes.find_or_create_by!(usuario: inscricao.usuario, tipo: \"fastpass\") do |notificacao|",
+        "            mensagem = if inscricao.status == \"sorteado\"",
+        "              \"Você foi sorteado para o FastPass. Horário do FastPass: #{sorteio.horario_fastpass.strftime('%d/%m/%Y às %H:%M')}.\"",
+        "            else",
+        "              \"Você não foi sorteado para o FastPass.\"",
+        "            end",
+        "            notificacao.assign_attributes(titulo: \"Resultado do FastPass\", mensagem: mensagem,",
+        "              status_envio: \"enviada\", enviado_em: agora, lida: false)",
+        "          end",
+        "        end",
+        "      end",
+        "    end",
+        "  end",
+        "end"
+      ],
+      "lines": [
+        1,
+        1,
+        13,
+        13,
+        11,
+        11,
+        null,
+        9,
+        9,
+        null,
+        9,
+        8,
+        7,
+        null,
+        6,
+        5,
+        4,
+        null,
+        1,
+        null,
+        5,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "lines_covered_percent": 100.0,
+      "covered_lines": 16,
+      "missed_lines": 0,
+      "omitted_lines": 12,
+      "total_lines": 16,
+      "branches": [],
+      "branches_covered_percent": 100.0,
+      "covered_branches": 0,
+      "missed_branches": 0,
+      "total_branches": 0
+    }
+  },
+  "groups": {
+    "Controllers": {
+      "lines": {
+        "covered": 170,
+        "missed": 169,
+        "omitted": 281,
+        "total": 339,
+        "percent": 50.147492625368734,
+        "strength": 1.4778761061946903
+      },
+      "branches": {
+        "covered": 0,
+        "missed": 0,
+        "total": 0,
+        "percent": 100.0,
+        "strength": 0.0
+      },
+      "files": [
+        "app/controllers/application_controller.rb",
+        "app/controllers/avaliacoes_controller.rb",
+        "app/controllers/cardapios_controller.rb",
+        "app/controllers/catraca_operacao_controller.rb",
+        "app/controllers/catracas_controller.rb",
+        "app/controllers/concerns/controle_de_acesso.rb",
+        "app/controllers/extratos_controller.rb",
+        "app/controllers/historicos_controller.rb",
+        "app/controllers/home_controller.rb",
+        "app/controllers/notificacoes_controller.rb",
+        "app/controllers/painel_controle_controller.rb",
+        "app/controllers/recargas_controller.rb",
+        "app/controllers/restaurantes_controller.rb",
+        "app/controllers/sessions_controller.rb",
+        "app/controllers/usuarios_controller.rb"
+      ]
+    },
+    "Helpers": {
+      "lines": {
+        "covered": 4,
+        "missed": 0,
+        "omitted": 6,
+        "total": 4,
+        "percent": 100.0,
+        "strength": 1.0
+      },
+      "branches": {
+        "covered": 0,
+        "missed": 0,
+        "total": 0,
+        "percent": 100.0,
+        "strength": 0.0
+      },
+      "files": [
+        "app/helpers/application_helper.rb",
+        "app/helpers/extratos_helper.rb",
+        "app/helpers/home_helper.rb",
+        "app/helpers/recargas_helper.rb"
+      ]
+    },
+    "Jobs": {
+      "lines": {
+        "covered": 5,
+        "missed": 0,
+        "omitted": 9,
+        "total": 5,
+        "percent": 100.0,
+        "strength": 1.0
+      },
+      "branches": {
+        "covered": 0,
+        "missed": 0,
+        "total": 0,
+        "percent": 100.0,
+        "strength": 0.0
+      },
+      "files": [
+        "app/jobs/application_job.rb",
+        "app/jobs/notificar_fastpass_job.rb"
+      ]
+    },
+    "Mailers": {
+      "lines": {
+        "covered": 0,
+        "missed": 3,
+        "omitted": 1,
+        "total": 3,
+        "percent": 0.0,
+        "strength": 0.0
+      },
+      "branches": {
+        "covered": 0,
+        "missed": 0,
+        "total": 0,
+        "percent": 100.0,
+        "strength": 0.0
+      },
+      "files": [
+        "app/mailers/application_mailer.rb"
+      ]
+    },
+    "Models": {
+      "lines": {
+        "covered": 124,
+        "missed": 0,
+        "omitted": 73,
+        "total": 124,
+        "percent": 100.0,
+        "strength": 6.548387096774194
+      },
+      "branches": {
+        "covered": 0,
+        "missed": 0,
+        "total": 0,
+        "percent": 100.0,
+        "strength": 0.0
+      },
+      "files": [
+        "app/models/acesso.rb",
+        "app/models/application_record.rb",
+        "app/models/avaliacao.rb",
+        "app/models/cardapio.rb",
+        "app/models/carteira.rb",
+        "app/models/catraca.rb",
+        "app/models/inscricao_fastpass.rb",
+        "app/models/item_cardapio.rb",
+        "app/models/notificacao.rb",
+        "app/models/recarga.rb",
+        "app/models/restaurante.rb",
+        "app/models/sorteio_fastpass.rb",
+        "app/models/turno.rb",
+        "app/models/usuario.rb"
+      ]
+    },
+    "Ungrouped": {
+      "lines": {
+        "covered": 172,
+        "missed": 17,
+        "omitted": 207,
+        "total": 189,
+        "percent": 91.005291005291,
+        "strength": 1.9523809523809523
+      },
+      "branches": {
+        "covered": 0,
+        "missed": 0,
+        "total": 0,
+        "percent": 100.0,
+        "strength": 0.0
+      },
+      "files": [
+        "app/services/extrato_pdf_generator.rb",
+        "app/services/extrato_service.rb",
+        "app/services/notificar_resultado_fastpass.rb"
+      ]
+    }
+  },
+  "errors": {},
+  "history": [
+    {
+      "created_at": "2026-11-24T20:05:47Z",
+      "branch": "sprint-2",
+      "commit": "4d211da89364433977e450997241d01e72277ebc",
+      "totals": {
+        "line": 67.01
+      },
+      "groups": {
+        "Controllers": {
+          "line": 41.29
+        },
+        "Helpers": {
+          "line": 100.0
+        },
+        "Jobs": {
+          "line": 100.0
+        },
+        "Mailers": {
+          "line": 0.0
+        },
+        "Models": {
+          "line": 100.0
+        },
+        "Ungrouped": {
+          "line": 91.0
+        }
+      },
+      "files": {
+        "app/controllers/application_controller.rb": {
+          "line": 100.0
+        },
+        "app/controllers/avaliacoes_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/cardapios_controller.rb": {
+          "line": 100.0
+        },
+        "app/controllers/catraca_operacao_controller.rb": {
+          "line": 96.42
+        },
+        "app/controllers/catracas_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/concerns/controle_de_acesso.rb": {
+          "line": 0.0
+        },
+        "app/controllers/extratos_controller.rb": {
+          "line": 90.0
+        },
+        "app/controllers/historicos_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/home_controller.rb": {
+          "line": 75.0
+        },
+        "app/controllers/notificacoes_controller.rb": {
+          "line": 100.0
+        },
+        "app/controllers/painel_controle_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/recargas_controller.rb": {
+          "line": 37.64
+        },
+        "app/controllers/restaurantes_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/sessions_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/usuarios_controller.rb": {
+          "line": 100.0
+        },
+        "app/helpers/application_helper.rb": {
+          "line": 100.0
+        },
+        "app/helpers/extratos_helper.rb": {
+          "line": 100.0
+        },
+        "app/helpers/home_helper.rb": {
+          "line": 100.0
+        },
+        "app/helpers/recargas_helper.rb": {
+          "line": 100.0
+        },
+        "app/jobs/application_job.rb": {
+          "line": 100.0
+        },
+        "app/jobs/notificar_fastpass_job.rb": {
+          "line": 100.0
+        },
+        "app/mailers/application_mailer.rb": {
+          "line": 0.0
+        },
+        "app/models/acesso.rb": {
+          "line": 100.0
+        },
+        "app/models/application_record.rb": {
+          "line": 100.0
+        },
+        "app/models/avaliacao.rb": {
+          "line": 100.0
+        },
+        "app/models/cardapio.rb": {
+          "line": 100.0
+        },
+        "app/models/carteira.rb": {
+          "line": 100.0
+        },
+        "app/models/catraca.rb": {
+          "line": 100.0
+        },
+        "app/models/inscricao_fastpass.rb": {
+          "line": 100.0
+        },
+        "app/models/item_cardapio.rb": {
+          "line": 100.0
+        },
+        "app/models/notificacao.rb": {
+          "line": 100.0
+        },
+        "app/models/recarga.rb": {
+          "line": 100.0
+        },
+        "app/models/restaurante.rb": {
+          "line": 100.0
+        },
+        "app/models/sorteio_fastpass.rb": {
+          "line": 100.0
+        },
+        "app/models/turno.rb": {
+          "line": 100.0
+        },
+        "app/models/usuario.rb": {
+          "line": 100.0
+        },
+        "app/services/extrato_pdf_generator.rb": {
+          "line": 97.97
+        },
+        "app/services/extrato_service.rb": {
+          "line": 79.72
+        },
+        "app/services/notificar_resultado_fastpass.rb": {
+          "line": 100.0
+        }
+      }
+    },
+    {
+      "created_at": "2026-11-24T20:15:11Z",
+      "branch": "sprint-2",
+      "commit": "4d211da89364433977e450997241d01e72277ebc",
+      "totals": {
+        "line": 67.01
+      },
+      "groups": {
+        "Controllers": {
+          "line": 41.29
+        },
+        "Helpers": {
+          "line": 100.0
+        },
+        "Jobs": {
+          "line": 100.0
+        },
+        "Mailers": {
+          "line": 0.0
+        },
+        "Models": {
+          "line": 100.0
+        },
+        "Ungrouped": {
+          "line": 91.0
+        }
+      },
+      "files": {
+        "app/controllers/application_controller.rb": {
+          "line": 100.0
+        },
+        "app/controllers/avaliacoes_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/cardapios_controller.rb": {
+          "line": 100.0
+        },
+        "app/controllers/catraca_operacao_controller.rb": {
+          "line": 96.42
+        },
+        "app/controllers/catracas_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/concerns/controle_de_acesso.rb": {
+          "line": 0.0
+        },
+        "app/controllers/extratos_controller.rb": {
+          "line": 90.0
+        },
+        "app/controllers/historicos_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/home_controller.rb": {
+          "line": 75.0
+        },
+        "app/controllers/notificacoes_controller.rb": {
+          "line": 100.0
+        },
+        "app/controllers/painel_controle_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/recargas_controller.rb": {
+          "line": 37.64
+        },
+        "app/controllers/restaurantes_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/sessions_controller.rb": {
+          "line": 0.0
+        },
+        "app/controllers/usuarios_controller.rb": {
+          "line": 100.0
+        },
+        "app/helpers/application_helper.rb": {
+          "line": 100.0
+        },
+        "app/helpers/extratos_helper.rb": {
+          "line": 100.0
+        },
+        "app/helpers/home_helper.rb": {
+          "line": 100.0
+        },
+        "app/helpers/recargas_helper.rb": {
+          "line": 100.0
+        },
+        "app/jobs/application_job.rb": {
+          "line": 100.0
+        },
+        "app/jobs/notificar_fastpass_job.rb": {
+          "line": 100.0
+        },
+        "app/mailers/application_mailer.rb": {
+          "line": 0.0
+        },
+        "app/models/acesso.rb": {
+          "line": 100.0
+        },
+        "app/models/application_record.rb": {
+          "line": 100.0
+        },
+        "app/models/avaliacao.rb": {
+          "line": 100.0
+        },
+        "app/models/cardapio.rb": {
+          "line": 100.0
+        },
+        "app/models/carteira.rb": {
+          "line": 100.0
+        },
+        "app/models/catraca.rb": {
+          "line": 100.0
+        },
+        "app/models/inscricao_fastpass.rb": {
+          "line": 100.0
+        },
+        "app/models/item_cardapio.rb": {
+          "line": 100.0
+        },
+        "app/models/notificacao.rb": {
+          "line": 100.0
+        },
+        "app/models/recarga.rb": {
+          "line": 100.0
+        },
+        "app/models/restaurante.rb": {
+          "line": 100.0
+        },
+        "app/models/sorteio_fastpass.rb": {
+          "line": 100.0
+        },
+        "app/models/turno.rb": {
+          "line": 100.0
+        },
+        "app/models/usuario.rb": {
+          "line": 100.0
+        },
+        "app/services/extrato_pdf_generator.rb": {
+          "line": 97.97
+        },
+        "app/services/extrato_service.rb": {
+          "line": 79.72
+        },
+        "app/services/notificar_resultado_fastpass.rb": {
+          "line": 100.0
+        }
+      }
+    },
+    {
+      "created_at": "2026-11-24T20:55:44Z",
+      "branch": "sprint-2",
+      "commit": "4d211da89364433977e450997241d01e72277ebc",
+      "totals": {
+        "line": 17.16,
+        "branch": 100.0
+      },
+      "groups": {
+        "Controllers": {
+          "line": 13.27,
+          "branch": 100.0
+        },
+        "Helpers": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "Jobs": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "Mailers": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "Models": {
+          "line": 52.41,
+          "branch": 100.0
+        },
+        "Ungrouped": {
+          "line": 0.0,
+          "branch": 100.0
+        }
+      },
+      "files": {
+        "app/controllers/application_controller.rb": {
+          "line": 70.0,
+          "branch": 100.0
+        },
+        "app/controllers/avaliacoes_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/cardapios_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/catraca_operacao_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/catracas_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/concerns/controle_de_acesso.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/extratos_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/historicos_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/home_controller.rb": {
+          "line": 91.66,
+          "branch": 100.0
+        },
+        "app/controllers/notificacoes_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/painel_controle_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/recargas_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/restaurantes_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/sessions_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/usuarios_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/helpers/application_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/extratos_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/home_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/recargas_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/jobs/application_job.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/jobs/notificar_fastpass_job.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/mailers/application_mailer.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/acesso.rb": {
+          "line": 52.38,
+          "branch": 100.0
+        },
+        "app/models/application_record.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/avaliacao.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/cardapio.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/carteira.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/catraca.rb": {
+          "line": 84.61,
+          "branch": 100.0
+        },
+        "app/models/inscricao_fastpass.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/item_cardapio.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/notificacao.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/recarga.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/restaurante.rb": {
+          "line": 82.35,
+          "branch": 100.0
+        },
+        "app/models/sorteio_fastpass.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/turno.rb": {
+          "line": 77.77,
+          "branch": 100.0
+        },
+        "app/models/usuario.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/services/extrato_pdf_generator.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/services/extrato_service.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/services/notificar_resultado_fastpass.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        }
+      }
+    },
+    {
+      "created_at": "2026-11-24T20:56:09Z",
+      "branch": "sprint-2",
+      "commit": "4d211da89364433977e450997241d01e72277ebc",
+      "totals": {
+        "line": 71.53,
+        "branch": 100.0
+      },
+      "groups": {
+        "Controllers": {
+          "line": 50.14,
+          "branch": 100.0
+        },
+        "Helpers": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "Jobs": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "Mailers": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "Models": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "Ungrouped": {
+          "line": 91.0,
+          "branch": 100.0
+        }
+      },
+      "files": {
+        "app/controllers/application_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/avaliacoes_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/cardapios_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/catraca_operacao_controller.rb": {
+          "line": 96.42,
+          "branch": 100.0
+        },
+        "app/controllers/catracas_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/concerns/controle_de_acesso.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/extratos_controller.rb": {
+          "line": 90.0,
+          "branch": 100.0
+        },
+        "app/controllers/historicos_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/home_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/notificacoes_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/painel_controle_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/recargas_controller.rb": {
+          "line": 37.64,
+          "branch": 100.0
+        },
+        "app/controllers/restaurantes_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/sessions_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/usuarios_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/application_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/extratos_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/home_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/recargas_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/jobs/application_job.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/jobs/notificar_fastpass_job.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/mailers/application_mailer.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/acesso.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/application_record.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/avaliacao.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/cardapio.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/carteira.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/catraca.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/inscricao_fastpass.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/item_cardapio.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/notificacao.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/recarga.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/restaurante.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/sorteio_fastpass.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/turno.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/usuario.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/services/extrato_pdf_generator.rb": {
+          "line": 97.97,
+          "branch": 100.0
+        },
+        "app/services/extrato_service.rb": {
+          "line": 79.72,
+          "branch": 100.0
+        },
+        "app/services/notificar_resultado_fastpass.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        }
+      }
+    },
+    {
+      "created_at": "2026-11-24T20:59:05Z",
+      "branch": "sprint-2",
+      "commit": "4d211da89364433977e450997241d01e72277ebc",
+      "totals": {
+        "line": 71.53,
+        "branch": 100.0
+      },
+      "groups": {
+        "Controllers": {
+          "line": 50.14,
+          "branch": 100.0
+        },
+        "Helpers": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "Jobs": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "Mailers": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "Models": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "Ungrouped": {
+          "line": 91.0,
+          "branch": 100.0
+        }
+      },
+      "files": {
+        "app/controllers/application_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/avaliacoes_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/cardapios_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/catraca_operacao_controller.rb": {
+          "line": 96.42,
+          "branch": 100.0
+        },
+        "app/controllers/catracas_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/concerns/controle_de_acesso.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/extratos_controller.rb": {
+          "line": 90.0,
+          "branch": 100.0
+        },
+        "app/controllers/historicos_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/home_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/notificacoes_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/painel_controle_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/recargas_controller.rb": {
+          "line": 37.64,
+          "branch": 100.0
+        },
+        "app/controllers/restaurantes_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/sessions_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/usuarios_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/application_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/extratos_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/home_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/recargas_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/jobs/application_job.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/jobs/notificar_fastpass_job.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/mailers/application_mailer.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/acesso.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/application_record.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/avaliacao.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/cardapio.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/carteira.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/catraca.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/inscricao_fastpass.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/item_cardapio.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/notificacao.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/recarga.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/restaurante.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/sorteio_fastpass.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/turno.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/usuario.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/services/extrato_pdf_generator.rb": {
+          "line": 97.97,
+          "branch": 100.0
+        },
+        "app/services/extrato_service.rb": {
+          "line": 79.72,
+          "branch": 100.0
+        },
+        "app/services/notificar_resultado_fastpass.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        }
+      }
+    },
+    {
+      "created_at": "2026-11-24T20:59:39Z",
+      "branch": "sprint-2",
+      "commit": "4d211da89364433977e450997241d01e72277ebc",
+      "totals": {
+        "line": 17.16,
+        "branch": 100.0
+      },
+      "groups": {
+        "Controllers": {
+          "line": 13.27,
+          "branch": 100.0
+        },
+        "Helpers": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "Jobs": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "Mailers": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "Models": {
+          "line": 52.41,
+          "branch": 100.0
+        },
+        "Ungrouped": {
+          "line": 0.0,
+          "branch": 100.0
+        }
+      },
+      "files": {
+        "app/controllers/application_controller.rb": {
+          "line": 70.0,
+          "branch": 100.0
+        },
+        "app/controllers/avaliacoes_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/cardapios_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/catraca_operacao_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/catracas_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/concerns/controle_de_acesso.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/extratos_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/historicos_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/home_controller.rb": {
+          "line": 91.66,
+          "branch": 100.0
+        },
+        "app/controllers/notificacoes_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/painel_controle_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/recargas_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/restaurantes_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/sessions_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/usuarios_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/helpers/application_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/extratos_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/home_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/recargas_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/jobs/application_job.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/jobs/notificar_fastpass_job.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/mailers/application_mailer.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/acesso.rb": {
+          "line": 52.38,
+          "branch": 100.0
+        },
+        "app/models/application_record.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/avaliacao.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/cardapio.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/carteira.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/catraca.rb": {
+          "line": 84.61,
+          "branch": 100.0
+        },
+        "app/models/inscricao_fastpass.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/item_cardapio.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/notificacao.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/recarga.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/restaurante.rb": {
+          "line": 82.35,
+          "branch": 100.0
+        },
+        "app/models/sorteio_fastpass.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/turno.rb": {
+          "line": 77.77,
+          "branch": 100.0
+        },
+        "app/models/usuario.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/services/extrato_pdf_generator.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/services/extrato_service.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/services/notificar_resultado_fastpass.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        }
+      }
+    },
+    {
+      "created_at": "2026-11-24T21:02:14Z",
+      "branch": "sprint-2",
+      "commit": "4d211da89364433977e450997241d01e72277ebc",
+      "totals": {
+        "line": 71.53,
+        "branch": 100.0
+      },
+      "groups": {
+        "Controllers": {
+          "line": 50.14,
+          "branch": 100.0
+        },
+        "Helpers": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "Jobs": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "Mailers": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "Models": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "Ungrouped": {
+          "line": 91.0,
+          "branch": 100.0
+        }
+      },
+      "files": {
+        "app/controllers/application_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/avaliacoes_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/cardapios_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/catraca_operacao_controller.rb": {
+          "line": 96.42,
+          "branch": 100.0
+        },
+        "app/controllers/catracas_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/concerns/controle_de_acesso.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/extratos_controller.rb": {
+          "line": 90.0,
+          "branch": 100.0
+        },
+        "app/controllers/historicos_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/home_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/notificacoes_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/controllers/painel_controle_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/recargas_controller.rb": {
+          "line": 37.64,
+          "branch": 100.0
+        },
+        "app/controllers/restaurantes_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/sessions_controller.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/controllers/usuarios_controller.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/application_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/extratos_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/home_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/helpers/recargas_helper.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/jobs/application_job.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/jobs/notificar_fastpass_job.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/mailers/application_mailer.rb": {
+          "line": 0.0,
+          "branch": 100.0
+        },
+        "app/models/acesso.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/application_record.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/avaliacao.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/cardapio.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/carteira.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/catraca.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/inscricao_fastpass.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/item_cardapio.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/notificacao.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/recarga.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/restaurante.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/sorteio_fastpass.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/turno.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/models/usuario.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        },
+        "app/services/extrato_pdf_generator.rb": {
+          "line": 97.97,
+          "branch": 100.0
+        },
+        "app/services/extrato_service.rb": {
+          "line": 79.72,
+          "branch": 100.0
+        },
+        "app/services/notificar_resultado_fastpass.rb": {
+          "line": 100.0,
+          "branch": 100.0
+        }
+      }
+    }
+  ]
+}

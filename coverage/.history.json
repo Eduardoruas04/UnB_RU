@@ -1,0 +1,1266 @@
+{
+  "simplecov_history": {
+    "format_version": 1,
+    "entries": [
+      {
+        "created_at": "2026-11-24T20:05:47Z",
+        "branch": "sprint-2",
+        "commit": "4d211da89364433977e450997241d01e72277ebc",
+        "totals": {
+          "line": 67.01
+        },
+        "groups": {
+          "Controllers": {
+            "line": 41.29
+          },
+          "Helpers": {
+            "line": 100.0
+          },
+          "Jobs": {
+            "line": 100.0
+          },
+          "Mailers": {
+            "line": 0.0
+          },
+          "Models": {
+            "line": 100.0
+          },
+          "Ungrouped": {
+            "line": 91.0
+          }
+        },
+        "files": {
+          "app/controllers/application_controller.rb": {
+            "line": 100.0
+          },
+          "app/controllers/avaliacoes_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/cardapios_controller.rb": {
+            "line": 100.0
+          },
+          "app/controllers/catraca_operacao_controller.rb": {
+            "line": 96.42
+          },
+          "app/controllers/catracas_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/concerns/controle_de_acesso.rb": {
+            "line": 0.0
+          },
+          "app/controllers/extratos_controller.rb": {
+            "line": 90.0
+          },
+          "app/controllers/historicos_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/home_controller.rb": {
+            "line": 75.0
+          },
+          "app/controllers/notificacoes_controller.rb": {
+            "line": 100.0
+          },
+          "app/controllers/painel_controle_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/recargas_controller.rb": {
+            "line": 37.64
+          },
+          "app/controllers/restaurantes_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/sessions_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/usuarios_controller.rb": {
+            "line": 100.0
+          },
+          "app/helpers/application_helper.rb": {
+            "line": 100.0
+          },
+          "app/helpers/extratos_helper.rb": {
+            "line": 100.0
+          },
+          "app/helpers/home_helper.rb": {
+            "line": 100.0
+          },
+          "app/helpers/recargas_helper.rb": {
+            "line": 100.0
+          },
+          "app/jobs/application_job.rb": {
+            "line": 100.0
+          },
+          "app/jobs/notificar_fastpass_job.rb": {
+            "line": 100.0
+          },
+          "app/mailers/application_mailer.rb": {
+            "line": 0.0
+          },
+          "app/models/acesso.rb": {
+            "line": 100.0
+          },
+          "app/models/application_record.rb": {
+            "line": 100.0
+          },
+          "app/models/avaliacao.rb": {
+            "line": 100.0
+          },
+          "app/models/cardapio.rb": {
+            "line": 100.0
+          },
+          "app/models/carteira.rb": {
+            "line": 100.0
+          },
+          "app/models/catraca.rb": {
+            "line": 100.0
+          },
+          "app/models/inscricao_fastpass.rb": {
+            "line": 100.0
+          },
+          "app/models/item_cardapio.rb": {
+            "line": 100.0
+          },
+          "app/models/notificacao.rb": {
+            "line": 100.0
+          },
+          "app/models/recarga.rb": {
+            "line": 100.0
+          },
+          "app/models/restaurante.rb": {
+            "line": 100.0
+          },
+          "app/models/sorteio_fastpass.rb": {
+            "line": 100.0
+          },
+          "app/models/turno.rb": {
+            "line": 100.0
+          },
+          "app/models/usuario.rb": {
+            "line": 100.0
+          },
+          "app/services/extrato_pdf_generator.rb": {
+            "line": 97.97
+          },
+          "app/services/extrato_service.rb": {
+            "line": 79.72
+          },
+          "app/services/notificar_resultado_fastpass.rb": {
+            "line": 100.0
+          }
+        }
+      },
+      {
+        "created_at": "2026-11-24T20:15:11Z",
+        "branch": "sprint-2",
+        "commit": "4d211da89364433977e450997241d01e72277ebc",
+        "totals": {
+          "line": 67.01
+        },
+        "groups": {
+          "Controllers": {
+            "line": 41.29
+          },
+          "Helpers": {
+            "line": 100.0
+          },
+          "Jobs": {
+            "line": 100.0
+          },
+          "Mailers": {
+            "line": 0.0
+          },
+          "Models": {
+            "line": 100.0
+          },
+          "Ungrouped": {
+            "line": 91.0
+          }
+        },
+        "files": {
+          "app/controllers/application_controller.rb": {
+            "line": 100.0
+          },
+          "app/controllers/avaliacoes_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/cardapios_controller.rb": {
+            "line": 100.0
+          },
+          "app/controllers/catraca_operacao_controller.rb": {
+            "line": 96.42
+          },
+          "app/controllers/catracas_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/concerns/controle_de_acesso.rb": {
+            "line": 0.0
+          },
+          "app/controllers/extratos_controller.rb": {
+            "line": 90.0
+          },
+          "app/controllers/historicos_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/home_controller.rb": {
+            "line": 75.0
+          },
+          "app/controllers/notificacoes_controller.rb": {
+            "line": 100.0
+          },
+          "app/controllers/painel_controle_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/recargas_controller.rb": {
+            "line": 37.64
+          },
+          "app/controllers/restaurantes_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/sessions_controller.rb": {
+            "line": 0.0
+          },
+          "app/controllers/usuarios_controller.rb": {
+            "line": 100.0
+          },
+          "app/helpers/application_helper.rb": {
+            "line": 100.0
+          },
+          "app/helpers/extratos_helper.rb": {
+            "line": 100.0
+          },
+          "app/helpers/home_helper.rb": {
+            "line": 100.0
+          },
+          "app/helpers/recargas_helper.rb": {
+            "line": 100.0
+          },
+          "app/jobs/application_job.rb": {
+            "line": 100.0
+          },
+          "app/jobs/notificar_fastpass_job.rb": {
+            "line": 100.0
+          },
+          "app/mailers/application_mailer.rb": {
+            "line": 0.0
+          },
+          "app/models/acesso.rb": {
+            "line": 100.0
+          },
+          "app/models/application_record.rb": {
+            "line": 100.0
+          },
+          "app/models/avaliacao.rb": {
+            "line": 100.0
+          },
+          "app/models/cardapio.rb": {
+            "line": 100.0
+          },
+          "app/models/carteira.rb": {
+            "line": 100.0
+          },
+          "app/models/catraca.rb": {
+            "line": 100.0
+          },
+          "app/models/inscricao_fastpass.rb": {
+            "line": 100.0
+          },
+          "app/models/item_cardapio.rb": {
+            "line": 100.0
+          },
+          "app/models/notificacao.rb": {
+            "line": 100.0
+          },
+          "app/models/recarga.rb": {
+            "line": 100.0
+          },
+          "app/models/restaurante.rb": {
+            "line": 100.0
+          },
+          "app/models/sorteio_fastpass.rb": {
+            "line": 100.0
+          },
+          "app/models/turno.rb": {
+            "line": 100.0
+          },
+          "app/models/usuario.rb": {
+            "line": 100.0
+          },
+          "app/services/extrato_pdf_generator.rb": {
+            "line": 97.97
+          },
+          "app/services/extrato_service.rb": {
+            "line": 79.72
+          },
+          "app/services/notificar_resultado_fastpass.rb": {
+            "line": 100.0
+          }
+        }
+      },
+      {
+        "created_at": "2026-11-24T20:55:44Z",
+        "branch": "sprint-2",
+        "commit": "4d211da89364433977e450997241d01e72277ebc",
+        "totals": {
+          "line": 17.16,
+          "branch": 100.0
+        },
+        "groups": {
+          "Controllers": {
+            "line": 13.27,
+            "branch": 100.0
+          },
+          "Helpers": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "Jobs": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "Mailers": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "Models": {
+            "line": 52.41,
+            "branch": 100.0
+          },
+          "Ungrouped": {
+            "line": 0.0,
+            "branch": 100.0
+          }
+        },
+        "files": {
+          "app/controllers/application_controller.rb": {
+            "line": 70.0,
+            "branch": 100.0
+          },
+          "app/controllers/avaliacoes_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/cardapios_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/catraca_operacao_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/catracas_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/concerns/controle_de_acesso.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/extratos_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/historicos_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/home_controller.rb": {
+            "line": 91.66,
+            "branch": 100.0
+          },
+          "app/controllers/notificacoes_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/painel_controle_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/recargas_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/restaurantes_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/sessions_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/usuarios_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/helpers/application_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/extratos_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/home_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/recargas_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/jobs/application_job.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/jobs/notificar_fastpass_job.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/mailers/application_mailer.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/acesso.rb": {
+            "line": 52.38,
+            "branch": 100.0
+          },
+          "app/models/application_record.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/avaliacao.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/cardapio.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/carteira.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/catraca.rb": {
+            "line": 84.61,
+            "branch": 100.0
+          },
+          "app/models/inscricao_fastpass.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/item_cardapio.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/notificacao.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/recarga.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/restaurante.rb": {
+            "line": 82.35,
+            "branch": 100.0
+          },
+          "app/models/sorteio_fastpass.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/turno.rb": {
+            "line": 77.77,
+            "branch": 100.0
+          },
+          "app/models/usuario.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/services/extrato_pdf_generator.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/services/extrato_service.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/services/notificar_resultado_fastpass.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          }
+        }
+      },
+      {
+        "created_at": "2026-11-24T20:56:09Z",
+        "branch": "sprint-2",
+        "commit": "4d211da89364433977e450997241d01e72277ebc",
+        "totals": {
+          "line": 71.53,
+          "branch": 100.0
+        },
+        "groups": {
+          "Controllers": {
+            "line": 50.14,
+            "branch": 100.0
+          },
+          "Helpers": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "Jobs": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "Mailers": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "Models": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "Ungrouped": {
+            "line": 91.0,
+            "branch": 100.0
+          }
+        },
+        "files": {
+          "app/controllers/application_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/avaliacoes_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/cardapios_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/catraca_operacao_controller.rb": {
+            "line": 96.42,
+            "branch": 100.0
+          },
+          "app/controllers/catracas_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/concerns/controle_de_acesso.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/extratos_controller.rb": {
+            "line": 90.0,
+            "branch": 100.0
+          },
+          "app/controllers/historicos_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/home_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/notificacoes_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/painel_controle_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/recargas_controller.rb": {
+            "line": 37.64,
+            "branch": 100.0
+          },
+          "app/controllers/restaurantes_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/sessions_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/usuarios_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/application_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/extratos_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/home_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/recargas_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/jobs/application_job.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/jobs/notificar_fastpass_job.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/mailers/application_mailer.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/acesso.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/application_record.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/avaliacao.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/cardapio.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/carteira.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/catraca.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/inscricao_fastpass.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/item_cardapio.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/notificacao.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/recarga.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/restaurante.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/sorteio_fastpass.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/turno.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/usuario.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/services/extrato_pdf_generator.rb": {
+            "line": 97.97,
+            "branch": 100.0
+          },
+          "app/services/extrato_service.rb": {
+            "line": 79.72,
+            "branch": 100.0
+          },
+          "app/services/notificar_resultado_fastpass.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          }
+        }
+      },
+      {
+        "created_at": "2026-11-24T20:59:05Z",
+        "branch": "sprint-2",
+        "commit": "4d211da89364433977e450997241d01e72277ebc",
+        "totals": {
+          "line": 71.53,
+          "branch": 100.0
+        },
+        "groups": {
+          "Controllers": {
+            "line": 50.14,
+            "branch": 100.0
+          },
+          "Helpers": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "Jobs": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "Mailers": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "Models": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "Ungrouped": {
+            "line": 91.0,
+            "branch": 100.0
+          }
+        },
+        "files": {
+          "app/controllers/application_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/avaliacoes_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/cardapios_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/catraca_operacao_controller.rb": {
+            "line": 96.42,
+            "branch": 100.0
+          },
+          "app/controllers/catracas_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/concerns/controle_de_acesso.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/extratos_controller.rb": {
+            "line": 90.0,
+            "branch": 100.0
+          },
+          "app/controllers/historicos_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/home_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/notificacoes_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/painel_controle_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/recargas_controller.rb": {
+            "line": 37.64,
+            "branch": 100.0
+          },
+          "app/controllers/restaurantes_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/sessions_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/usuarios_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/application_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/extratos_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/home_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/recargas_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/jobs/application_job.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/jobs/notificar_fastpass_job.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/mailers/application_mailer.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/acesso.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/application_record.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/avaliacao.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/cardapio.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/carteira.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/catraca.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/inscricao_fastpass.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/item_cardapio.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/notificacao.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/recarga.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/restaurante.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/sorteio_fastpass.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/turno.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/usuario.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/services/extrato_pdf_generator.rb": {
+            "line": 97.97,
+            "branch": 100.0
+          },
+          "app/services/extrato_service.rb": {
+            "line": 79.72,
+            "branch": 100.0
+          },
+          "app/services/notificar_resultado_fastpass.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          }
+        }
+      },
+      {
+        "created_at": "2026-11-24T20:59:39Z",
+        "branch": "sprint-2",
+        "commit": "4d211da89364433977e450997241d01e72277ebc",
+        "totals": {
+          "line": 17.16,
+          "branch": 100.0
+        },
+        "groups": {
+          "Controllers": {
+            "line": 13.27,
+            "branch": 100.0
+          },
+          "Helpers": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "Jobs": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "Mailers": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "Models": {
+            "line": 52.41,
+            "branch": 100.0
+          },
+          "Ungrouped": {
+            "line": 0.0,
+            "branch": 100.0
+          }
+        },
+        "files": {
+          "app/controllers/application_controller.rb": {
+            "line": 70.0,
+            "branch": 100.0
+          },
+          "app/controllers/avaliacoes_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/cardapios_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/catraca_operacao_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/catracas_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/concerns/controle_de_acesso.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/extratos_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/historicos_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/home_controller.rb": {
+            "line": 91.66,
+            "branch": 100.0
+          },
+          "app/controllers/notificacoes_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/painel_controle_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/recargas_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/restaurantes_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/sessions_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/usuarios_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/helpers/application_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/extratos_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/home_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/recargas_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/jobs/application_job.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/jobs/notificar_fastpass_job.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/mailers/application_mailer.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/acesso.rb": {
+            "line": 52.38,
+            "branch": 100.0
+          },
+          "app/models/application_record.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/avaliacao.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/cardapio.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/carteira.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/catraca.rb": {
+            "line": 84.61,
+            "branch": 100.0
+          },
+          "app/models/inscricao_fastpass.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/item_cardapio.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/notificacao.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/recarga.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/restaurante.rb": {
+            "line": 82.35,
+            "branch": 100.0
+          },
+          "app/models/sorteio_fastpass.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/turno.rb": {
+            "line": 77.77,
+            "branch": 100.0
+          },
+          "app/models/usuario.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/services/extrato_pdf_generator.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/services/extrato_service.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/services/notificar_resultado_fastpass.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          }
+        }
+      },
+      {
+        "created_at": "2026-11-24T21:02:14Z",
+        "branch": "sprint-2",
+        "commit": "4d211da89364433977e450997241d01e72277ebc",
+        "totals": {
+          "line": 71.53,
+          "branch": 100.0
+        },
+        "groups": {
+          "Controllers": {
+            "line": 50.14,
+            "branch": 100.0
+          },
+          "Helpers": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "Jobs": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "Mailers": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "Models": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "Ungrouped": {
+            "line": 91.0,
+            "branch": 100.0
+          }
+        },
+        "files": {
+          "app/controllers/application_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/avaliacoes_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/cardapios_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/catraca_operacao_controller.rb": {
+            "line": 96.42,
+            "branch": 100.0
+          },
+          "app/controllers/catracas_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/concerns/controle_de_acesso.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/extratos_controller.rb": {
+            "line": 90.0,
+            "branch": 100.0
+          },
+          "app/controllers/historicos_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/home_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/notificacoes_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/controllers/painel_controle_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/recargas_controller.rb": {
+            "line": 37.64,
+            "branch": 100.0
+          },
+          "app/controllers/restaurantes_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/sessions_controller.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/controllers/usuarios_controller.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/application_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/extratos_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/home_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/helpers/recargas_helper.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/jobs/application_job.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/jobs/notificar_fastpass_job.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/mailers/application_mailer.rb": {
+            "line": 0.0,
+            "branch": 100.0
+          },
+          "app/models/acesso.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/application_record.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/avaliacao.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/cardapio.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/carteira.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/catraca.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/inscricao_fastpass.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/item_cardapio.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/notificacao.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/recarga.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/restaurante.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/sorteio_fastpass.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/turno.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/models/usuario.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          },
+          "app/services/extrato_pdf_generator.rb": {
+            "line": 97.97,
+            "branch": 100.0
+          },
+          "app/services/extrato_service.rb": {
+            "line": 79.72,
+            "branch": 100.0
+          },
+          "app/services/notificar_resultado_fastpass.rb": {
+            "line": 100.0,
+            "branch": 100.0
+          }
+        }
+      }
+    ]
+  }
+}
