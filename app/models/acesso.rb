@@ -8,6 +8,14 @@ class Acesso < ApplicationRecord
   validates :valor_pago_centavos, numericality: { greater_than_or_equal_to: 0 }
   validates :forma_acesso, presence: true
 
+  # Registra a leitura da matrícula na catraca: libera se o saldo cobre a refeição, senão recusa.
+  def self.registrar_leitura!(usuario:, catraca:, turno:)
+    liberado = usuario.carteira&.cobre?(turno.valor_refeicao_centavos) || false
+    create!(usuario: usuario, catraca: catraca, turno: turno, autorizado: liberado,
+            valor_pago_centavos: 0, motivo_recusa: ("Saldo insuficiente" unless liberado),
+            data_hora: Time.current)
+  end
+
   def aguardando_passagem?
     autorizado? && valor_pago_centavos.to_i.zero? && motivo_recusa.nil?
   end
@@ -16,10 +24,10 @@ class Acesso < ApplicationRecord
   def confirmar_passagem!
     carteira = usuario.carteira
     preco = turno.valor_refeicao_centavos
-    return false unless aguardando_passagem? && carteira && carteira.saldo_centavos >= preco
+    return false unless aguardando_passagem? && carteira&.cobre?(preco)
 
     transaction do
-      carteira.update!(saldo_centavos: carteira.saldo_centavos - preco)
+      carteira.debitar!(preco)
       update!(valor_pago_centavos: preco, data_hora: Time.current)
     end
     true

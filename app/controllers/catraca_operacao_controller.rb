@@ -1,29 +1,20 @@
 # Issue #6 - Validação de entrada na catraca
 class CatracaOperacaoController < ApplicationController
   def show
-    @catraca = Catraca.find_by(status: "ativa")
+    @catraca = catraca_ativa
     @turno = Turno.em_atendimento
     @acesso = Acesso.find_by(id: params[:acesso_id])
   end
 
   def ler
-    catraca = Catraca.find_by(status: "ativa")
+    catraca = catraca_ativa
     turno = Turno.em_atendimento
-    aluno = Usuario.find_by(matricula: params[:matricula].to_s.strip, papel: "estudante")
+    aluno = estudante_lido
+    bloqueio = motivo_de_bloqueio(catraca, turno, aluno)
+    return redirect_to(catraca_operacao_path, alert: bloqueio) if bloqueio
 
-    if catraca.nil? || turno.nil?
-      redirect_to catraca_operacao_path, alert: "Nenhuma refeição em atendimento"
-    elsif aluno.nil?
-      redirect_to catraca_operacao_path, alert: "Aluno não cadastrado"
-    elsif aluno.carteira.nil? || aluno.carteira.saldo_centavos < turno.valor_refeicao_centavos
-      Acesso.create!(usuario: aluno, catraca: catraca, turno: turno, autorizado: false,
-                     valor_pago_centavos: 0, motivo_recusa: "Saldo insuficiente", data_hora: Time.current)
-      redirect_to catraca_operacao_path, alert: "Saldo insuficiente"
-    else
-      acesso = Acesso.create!(usuario: aluno, catraca: catraca, turno: turno, autorizado: true,
-                              valor_pago_centavos: 0, data_hora: Time.current)
-      redirect_to catraca_operacao_path(acesso_id: acesso.id), notice: "Comando de liberação enviado para a catraca"
-    end
+    acesso = Acesso.registrar_leitura!(usuario: aluno, catraca: catraca, turno: turno)
+    redirecionar_apos_leitura(acesso)
   end
 
   def confirmar
@@ -41,6 +32,30 @@ class CatracaOperacaoController < ApplicationController
       redirect_to catraca_operacao_path, notice: "Entrada encerrada sem passagem"
     else
       redirect_to catraca_operacao_path, alert: "Este acesso não está aguardando passagem"
+    end
+  end
+
+  private
+
+  def catraca_ativa
+    Catraca.find_by(status: "ativa")
+  end
+
+  def estudante_lido
+    Usuario.find_by(matricula: params[:matricula].to_s.strip, papel: "estudante")
+  end
+
+  def motivo_de_bloqueio(catraca, turno, aluno)
+    return "Nenhuma refeição em atendimento" unless catraca && turno
+
+    "Aluno não cadastrado" unless aluno
+  end
+
+  def redirecionar_apos_leitura(acesso)
+    if acesso.autorizado?
+      redirect_to catraca_operacao_path(acesso_id: acesso.id), notice: "Comando de liberação enviado para a catraca"
+    else
+      redirect_to catraca_operacao_path, alert: acesso.motivo_recusa
     end
   end
 end
