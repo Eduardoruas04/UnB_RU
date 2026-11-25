@@ -33,3 +33,7 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+# Relatorios de cobertura e documentacao gerados localmente (Sprint 3)
+/coverage/
+/doc/
+
