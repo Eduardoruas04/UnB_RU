@@ -10,15 +10,11 @@
 # ==============================================================================
 class ExtratosController < ApplicationController
   before_action :autenticar_usuario!
+  before_action :carregar_extrato, only: [ :show, :exportar_pdf ]
 
   # GET /extrato
   # Exibe o extrato consolidado com cards de resumo e filtros interativos
   def show
-    @usuario = current_user
-    @filtros = extrair_filtros
-    @extrato_service = ExtratoService.new(@usuario, @filtros)
-
-    @lancamentos = @extrato_service.lancamentos
     @total_gasto = @extrato_service.total_gasto_formatado
     @refeicoes_realizadas = @extrato_service.refeicoes_realizadas_count
     @total_recarregado = @extrato_service.total_recarregado_formatado
@@ -29,40 +25,51 @@ class ExtratosController < ApplicationController
   # GET /extrato/exportar_pdf
   # Gera e dispara o download do arquivo PDF filtrado
   def exportar_pdf
-    @usuario = current_user
-    @filtros = extrair_filtros
-    @extrato_service = ExtratoService.new(@usuario, @filtros)
-    @lancamentos = @extrato_service.lancamentos
+    return redirecionar_sem_registros if @lancamentos.empty?
 
-    # Cenários Tristes 5 e 6: filtro sem resultados ou histórico zerado
-    if @lancamentos.empty?
-      flash[:alert] = "Não há registros para exportar"
-      redirect_to extrato_path(@filtros)
-      return
-    end
-
-    # Cenário Triste 8: tratamento de falha no serviço gerador de PDF
-    begin
-      raise StandardError, "Serviço indisponível" if defined?($pdf_service_indisponivel) && $pdf_service_indisponivel
-
-      pdf_bytes = ExtratoPdfGenerator.new(usuario: @usuario, extrato_service: @extrato_service).gerar
-      send_data(
-        pdf_bytes,
-        filename: "extrato_refeicoes_#{@usuario.matricula}.pdf",
-        type: "application/pdf",
-        disposition: "attachment"
-      )
-    rescue StandardError => e
-      Rails.logger.error("Erro na geracao de PDF: #{e.message}")
-      flash[:alert] = "Não foi possível gerar o PDF. Tente novamente"
-      redirect_to extrato_path(@filtros)
-    end
+    gerar_e_enviar_pdf
+  rescue StandardError => e
+    tratar_erro_pdf(e)
   end
 
   private
 
+  def carregar_extrato
+    @usuario = current_user
+    @filtros = extrair_filtros
+    @extrato_service = ExtratoService.new(@usuario, @filtros)
+    @lancamentos = @extrato_service.lancamentos
+  end
+
   # Sanitiza e extrai os parâmetros de filtro da URL
   def extrair_filtros
     params.permit(:periodo, :tipo_refeicao, :forma_acesso)
+  end
+
+  def redirecionar_sem_registros
+    flash[:alert] = "Não há registros para exportar"
+    redirect_to extrato_path(@filtros)
+  end
+
+  def gerar_e_enviar_pdf
+    raise StandardError, "Serviço indisponível" if servico_pdf_indisponivel?
+
+    pdf_bytes = ExtratoPdfGenerator.new(usuario: @usuario, extrato_service: @extrato_service).gerar
+    send_data(
+      pdf_bytes,
+      filename: "extrato_refeicoes_#{@usuario.matricula}.pdf",
+      type: "application/pdf",
+      disposition: "attachment"
+    )
+  end
+
+  def servico_pdf_indisponivel?
+    defined?($pdf_service_indisponivel) && $pdf_service_indisponivel
+  end
+
+  def tratar_erro_pdf(erro)
+    Rails.logger.error("Erro na geracao de PDF: #{erro.message}")
+    flash[:alert] = "Não foi possível gerar o PDF. Tente novamente"
+    redirect_to extrato_path(@filtros)
   end
 end

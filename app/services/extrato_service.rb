@@ -12,6 +12,13 @@
 # calculando ainda os agregadores dos cards do Figma US04.
 # ==============================================================================
 class ExtratoService
+  TARIFA_UNITARIA_CENTAVOS = 450
+  PERIODOS = {
+    /30/ => -> { 30.days.ago.beginning_of_day },
+    /7/ => -> { 7.days.ago.beginning_of_day },
+    /m[eê]s/ => -> { Time.current.beginning_of_month }
+  }.freeze
+
   # Estrutura unificada representando um lançamento contábil no extrato
   Lancamento = Struct.new(
     :id,
@@ -86,93 +93,101 @@ class ExtratoService
 
   def saldo_atual_refeicoes
     saldo = @usuario.carteira&.saldo_centavos || 0
-    saldo / 450
+    saldo / TARIFA_UNITARIA_CENTAVOS
   end
 
   private
 
   # Unifica recargas e acessos em memória e aplica os filtros ativos
   def consolidar_lancamentos
-    lista = []
-
-    # 1. Carrega recargas pagas do estudante
-    usuario.recargas.where(status: "paga").find_each do |recarga|
-      lista << Lancamento.new(
-        "recarga-#{recarga.id}",
-        :recarga,
-        recarga.created_at,
-        "Recarga de Saldo",
-        "Portal Online",
-        recarga.metodo_pagamento || "PIX Instantâneo",
-        :credito,
-        recarga.valor_centavos
-      )
-    end
-
-    # 2. Carrega acessos autorizados do estudante
-    usuario.acessos.where(autorizado: true).includes(:turno, catraca: :restaurante).find_each do |acesso|
-      turno_nome = acesso.turno&.nome || "Refeição"
-      restaurante_nome = formatar_restaurante(acesso.catraca&.restaurante)
-      forma = acesso.forma_acesso.presence || "QR Code App"
-
-      lista << Lancamento.new(
-        "acesso-#{acesso.id}",
-        :acesso,
-        acesso.data_hora || acesso.created_at,
-        turno_nome,
-        restaurante_nome,
-        forma,
-        :debito,
-        acesso.valor_pago_centavos || 450
-      )
-    end
-
-    # 3. Ordena por data decrescente
+    lista = carregar_recargas + carregar_acessos
     lista.sort_by! { |l| l.data_hora || Time.zone.at(0) }.reverse!
-
-    # 4. Aplica os filtros recebidos por parâmetro
     aplicar_filtros(lista)
   end
 
+  def carregar_recargas
+    usuario.recargas.where(status: "paga").map { |recarga| montar_lancamento_recarga(recarga) }
+  end
+
+  def montar_lancamento_recarga(recarga)
+    Lancamento.new(
+      "recarga-#{recarga.id}",
+      :recarga,
+      recarga.created_at,
+      "Recarga de Saldo",
+      "Portal Online",
+      recarga.metodo_pagamento || "PIX Instantâneo",
+      :credito,
+      recarga.valor_centavos
+    )
+  end
+
+  def carregar_acessos
+    usuario.acessos.where(autorizado: true).includes(:turno, catraca: :restaurante).map do |acesso|
+      montar_lancamento_acesso(acesso)
+    end
+  end
+
+  def montar_lancamento_acesso(acesso)
+    Lancamento.new(
+      "acesso-#{acesso.id}",
+      :acesso,
+      acesso.data_hora || acesso.created_at,
+      acesso.turno&.nome || "Refeição",
+      restaurante_do_acesso(acesso),
+      acesso.forma_acesso.presence || "QR Code App",
+      :debito,
+      acesso.valor_pago_centavos || TARIFA_UNITARIA_CENTAVOS
+    )
+  end
+
+  def restaurante_do_acesso(acesso)
+    formatar_restaurante(acesso.catraca&.restaurante)
+  end
+
   def aplicar_filtros(lista)
-    resultado = lista
+    lista = filtrar_por_periodo(lista)
+    lista = filtrar_por_tipo(lista)
+    filtrar_por_forma_acesso(lista)
+  end
 
-    # Filtro: Período de Referência
-    if filtros[:periodo].present?
-      case filtros[:periodo].to_s.downcase
-      when /30/
-        data_limite = 30.days.ago.beginning_of_day
-        resultado = resultado.select { |l| l.data_hora && l.data_hora >= data_limite }
-      when /7/
-        data_limite = 7.days.ago.beginning_of_day
-        resultado = resultado.select { |l| l.data_hora && l.data_hora >= data_limite }
-      when /m[eê]s/
-        data_limite = Time.current.beginning_of_month
-        resultado = resultado.select { |l| l.data_hora && l.data_hora >= data_limite }
-      end
-    end
+  def filtrar_por_periodo(lista)
+    data_limite = calcular_data_limite(filtros[:periodo])
+    return lista unless data_limite
 
-    # Filtro: Tipo de Refeição / Evento
-    if filtros[:tipo_refeicao].present? && filtros[:tipo_refeicao] != "Todas"
-      tipo = filtros[:tipo_refeicao].to_s.downcase
-      resultado = resultado.select do |l|
-        if tipo.include?("recarga")
-          l.credito?
-        else
-          l.evento.to_s.downcase.include?(tipo)
-        end
-      end
-    end
+    lista.select { |l| l.data_hora && l.data_hora >= data_limite }
+  end
 
-    # Filtro: Forma de Acesso
-    if filtros[:forma_acesso].present? && filtros[:forma_acesso] != "Todas"
-      forma = filtros[:forma_acesso].to_s.downcase
-      resultado = resultado.select do |l|
-        l.forma_acesso.to_s.downcase.include?(forma)
-      end
-    end
+  def calcular_data_limite(periodo)
+    return nil if periodo.blank?
 
-    resultado
+    texto = periodo.to_s.downcase
+    _, calculo = PERIODOS.find { |padrao, _| texto.match?(padrao) }
+    calculo&.call
+  end
+
+  def filtrar_por_tipo(lista)
+    return lista unless filtro_ativo?(:tipo_refeicao)
+
+    tipo = filtros[:tipo_refeicao].to_s.downcase
+    lista.select { |l| corresponde_ao_tipo?(l, tipo) }
+  end
+
+  def corresponde_ao_tipo?(lancamento, tipo)
+    return lancamento.credito? if tipo.include?("recarga")
+
+    lancamento.evento.to_s.downcase.include?(tipo)
+  end
+
+  def filtrar_por_forma_acesso(lista)
+    return lista unless filtro_ativo?(:forma_acesso)
+
+    forma = filtros[:forma_acesso].to_s.downcase
+    lista.select { |l| l.forma_acesso.to_s.downcase.include?(forma) }
+  end
+
+  def filtro_ativo?(chave)
+    filtros[chave].present? && filtros[chave] != "Todas"
   end
 
   # Simplifica o nome do restaurante removendo prefixos longos (ex: "Restaurante Universitário - ")
