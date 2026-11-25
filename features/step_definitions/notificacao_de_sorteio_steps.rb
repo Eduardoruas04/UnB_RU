@@ -19,6 +19,10 @@ end
 
 module EstudantesFastpassSteps
   include ActiveSupport::Testing::TimeHelpers
+  # [Descrição] Busca ou cria o estudante usado nos cenários FastPass.
+  # [Argumentos] +matricula+ identifica a conta de teste.
+  # [Retorno] Um Usuario existente ou recém-criado.
+  # [Efeitos colaterais] Pode inserir um usuário no banco de teste.
   def estudante_fastpass(matricula)
     Usuario.find_or_create_by!(matricula: matricula) do |usuario|
       usuario.assign_attributes(nome: "Estudante FastPass", email: "#{matricula}@aluno.unb.br",
@@ -26,6 +30,10 @@ module EstudantesFastpassSteps
     end
   end
 
+  # [Descrição] Executa o job FastPass no horário simulado pelo cenário.
+  # [Argumentos] +horario+ é uma String com a hora local de Brasília na data do cenário.
+  # [Retorno] O resultado da execução síncrona do job, normalmente +nil+.
+  # [Efeitos colaterais] Simula o relógio durante a execução do job, que pode gravar notificações no banco de teste.
   def processar_fastpass_no_horario(horario)
     agora = Time.find_zone!("America/Sao_Paulo").parse("2026-11-12 #{horario}")
     travel_to(agora) do
