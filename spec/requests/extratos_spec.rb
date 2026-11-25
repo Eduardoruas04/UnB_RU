@@ -1,3 +1,4 @@
+
 # frozen_string_literal: true
 
 # ==============================================================================
@@ -7,6 +8,7 @@
 # - GET /extrato (renderização HTML autenticada e redirecionamento deslogado)
 # - GET /extrato/exportar_pdf (geração e entrega do binário application/pdf)
 # - Validação de alerta quando não existem registros para exportação
+# - Tratamento de falha na geração do PDF
 # ==============================================================================
 
 require "rails_helper"
@@ -22,7 +24,9 @@ RSpec.describe "Extratos", type: :request do
     end
   end
 
-  let!(:carteira) { usuario.carteira || usuario.create_carteira(saldo_centavos: 1800) }
+  let!(:carteira) do
+    usuario.carteira || usuario.create_carteira(saldo_centavos: 1800)
+  end
 
   let!(:restaurante) do
     Restaurante.find_or_create_by!(nome: "Restaurante Universitário - Darcy Ribeiro") do |r|
@@ -54,6 +58,7 @@ RSpec.describe "Extratos", type: :request do
 
       it "retorna status HTTP 200 (sucesso)" do
         get "/extrato"
+
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Extrato e Histórico de Refeições")
       end
@@ -62,6 +67,7 @@ RSpec.describe "Extratos", type: :request do
     context "quando o usuário não está autenticado" do
       it "redireciona para a página de login" do
         get "/extrato"
+
         expect(response).to redirect_to("/login")
       end
     end
@@ -82,6 +88,7 @@ RSpec.describe "Extratos", type: :request do
             status: "paga",
             metodo_pagamento: "PIX Instantâneo"
           )
+
           usuario.acessos.create!(
             catraca: catraca,
             turno: turno,
@@ -94,10 +101,13 @@ RSpec.describe "Extratos", type: :request do
 
         it "entrega um arquivo binário em formato PDF com cabeçalhos de anexo" do
           get "/extrato/exportar_pdf"
+
           expect(response).to have_http_status(:success)
           expect(response.content_type).to eq("application/pdf")
           expect(response.headers["Content-Disposition"]).to include("attachment")
-          expect(response.headers["Content-Disposition"]).to include("extrato_refeicoes_#{usuario.matricula}.pdf")
+          expect(response.headers["Content-Disposition"]).to include(
+            "extrato_refeicoes_#{usuario.matricula}.pdf"
+          )
           expect(response.body).to start_with("%PDF-")
         end
       end
@@ -110,8 +120,34 @@ RSpec.describe "Extratos", type: :request do
 
         it "redireciona para o extrato com mensagem de alerta" do
           get "/extrato/exportar_pdf"
+
           expect(response).to redirect_to(extrato_path)
           expect(flash[:alert]).to eq("Não há registros para exportar")
+        end
+      end
+
+      context "quando o serviço de geração do PDF está indisponível" do
+        before do
+          usuario.recargas.create!(
+            carteira: carteira,
+            quantidade_refeicoes: 5,
+            valor_centavos: 2250,
+            status: "paga",
+            metodo_pagamento: "PIX Instantâneo"
+          )
+        end
+
+        it "redireciona para o extrato e apresenta uma mensagem de erro" do
+          $pdf_service_indisponivel = true
+
+          get "/extrato/exportar_pdf"
+
+          expect(response).to redirect_to(extrato_path)
+          expect(flash[:alert]).to eq(
+            "Não foi possível gerar o PDF. Tente novamente"
+          )
+        ensure
+          $pdf_service_indisponivel = nil
         end
       end
     end
@@ -119,6 +155,7 @@ RSpec.describe "Extratos", type: :request do
     context "quando o usuário não está autenticado" do
       it "redireciona para a página de login" do
         get "/extrato/exportar_pdf"
+
         expect(response).to redirect_to("/login")
       end
     end
