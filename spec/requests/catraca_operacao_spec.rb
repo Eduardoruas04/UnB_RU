@@ -36,6 +36,13 @@ RSpec.describe "Operação da catraca", type: :request do
     expect(Acesso.last.motivo_recusa).to eq("Saldo insuficiente")
   end
 
+  it "nega aluno sem carteira" do
+    aluno
+    ler("190012345")
+    expect(response.body).to include("Saldo insuficiente")
+    expect(Acesso.last.autorizado).to be false
+  end
+
   it "nega aluno não cadastrado" do
     ler("000000000")
     expect(response.body).to include("Aluno não cadastrado")
@@ -75,5 +82,16 @@ RSpec.describe "Operação da catraca", type: :request do
     post catraca_confirmar_path(acesso)
     follow_redirect!
     expect(response.body).to include("Este acesso não está aguardando passagem")
+  end
+
+  it "não encerra um acesso que já teve a passagem confirmada" do
+    Carteira.create!(usuario: aluno, saldo_centavos: 1000)
+    ler("190012345")
+    acesso = Acesso.last
+    acesso.confirmar_passagem!
+    post catraca_encerrar_path(acesso)
+    follow_redirect!
+    expect(response.body).to include("Este acesso não está aguardando passagem")
+    expect(aluno.carteira.reload.saldo_centavos).to eq(500)
   end
 end
