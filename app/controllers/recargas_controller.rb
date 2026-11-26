@@ -109,7 +109,7 @@ class RecargasController < ApplicationController
   # * Cria um registro na tabela +carteiras+ com saldo zero caso o usuário ainda não possua carteira.
   def carregar_conta
     @usuario = current_user
-    @carteira = @usuario&.carteira || @usuario&.create_carteira(saldo_centavos: 0)
+    @carteira = @usuario.carteira || @usuario.create_carteira(saldo_centavos: 0)
   end
 
   # Localiza a recarga solicitada restrita ao estudante atualmente autenticado.
@@ -152,7 +152,7 @@ class RecargasController < ApplicationController
   # Efeitos colaterais:
   # * Nenhum.
   def saldo_em_refeicoes
-    (@carteira&.saldo_centavos || 0) / TARIFA_UNITARIA_CENTAVOS
+    @carteira.saldo_centavos / TARIFA_UNITARIA_CENTAVOS
   end
 
   # Formata um valor monetário em centavos para string no padrão brasileiro (vírgula decimal).
