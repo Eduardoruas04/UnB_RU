@@ -1,7 +1,7 @@
 <% if registro.errors.any? %>
-  <ul class="erros">
+  <ul class="erros" style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; border-radius: 8px; padding: 12px 16px 12px 32px; margin: 0 0 16px 0; font-size: 0.9rem;">
     <% registro.errors.full_messages.each do |mensagem| %>
-      <li><%= mensagem %></li>
+      <li style="margin: 4px 0;"><%= mensagem %></li>
     <% end %>
   </ul>
 <% end %>

@@ -1,43 +1,355 @@
-<h1>Histórico local da catraca</h1>
+<% acessos_lista = @acessos.present? ? @acessos.to_a : [] %>
+<% total_autorizados = acessos_lista.count(&:autorizado?) %>
+<% total_recusados = acessos_lista.count { |a| !a.autorizado? } %>
+<% total_debitado_centavos = acessos_lista.sum { |a| a.valor_pago_centavos.to_i } %>
 
-<%= form_with url: historico_local_path, method: :get do |f| %>
-  <%= f.label :catraca_id, "Catraca" %>
-  <%= f.select :catraca_id,
-        @catracas.map { |c| ["#{c.codigo_identificador} - #{c.restaurante&.nome}", c.id] },
-        { include_blank: "Selecione", selected: @catraca&.id } %>
-  <%= f.submit "Selecionar catraca" %>
-<% end %>
+<style>
+  .hl-page {
+    max-width: 1120px;
+    margin: 24px auto 48px;
+    padding: 0 20px;
+  }
+  .hl-topbar {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+  .hl-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hl-brand-badge {
+    background: #0f3d7a;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 8px 10px;
+    border-radius: 6px;
+  }
+  .hl-op-pill {
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+  }
+  .hl-breadcrumb {
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-bottom: 14px;
+  }
+  .hl-header-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+  .hl-header-card h1 {
+    margin: 0;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #0f3d7a;
+  }
+  .hl-header-card h2 {
+    margin: 6px 0 0 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #334155;
+  }
+  .hl-meta-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .hl-meta-pill {
+    background: #f1f5f9;
+    color: #1e293b;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+  }
+  .hl-meta-pill.active {
+    background: #dcfce7;
+    color: #15803d;
+    border-color: #86efac;
+  }
+  .hl-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .hl-kpi-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+  .hl-kpi-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin-bottom: 6px;
+  }
+  .hl-kpi-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f3d7a;
+  }
+  .hl-kpi-value.green {
+    color: #15803d;
+  }
+  .hl-kpi-value.red {
+    color: #b91c1c;
+  }
+  .hl-filter-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+  .hl-filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+  .hl-filter-form label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #334155;
+  }
+  .hl-filter-form select {
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    font-size: 0.9rem;
+    color: #0f172a;
+    background: #ffffff;
+  }
+  .hl-btn-primary {
+    background: #0f3d7a;
+    color: #ffffff;
+    border: none;
+    border-radius: 7px;
+    padding: 8px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .hl-btn-primary:hover {
+    background: #1e40af;
+  }
+  .hl-message {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-left: 4px solid #0f3d7a;
+    color: #1e293b;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    margin: 0 0 20px 0;
+  }
+  .hl-table-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow-x: auto;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    margin-bottom: 24px;
+  }
+  .hl-table-card table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  .hl-table-card thead th {
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    background: #f8fafc;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .hl-table-card tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #0f172a;
+  }
+  .hl-row-denied {
+    background: #fef2f2;
+  }
+  .hl-badge-ok {
+    display: inline-block;
+    background: #dcfce7;
+    color: #15803d;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .hl-badge-denied {
+    display: inline-block;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .hl-back-link {
+    display: inline-block;
+    color: #0f3d7a;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 8px 14px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    border-radius: 7px;
+  }
+  .hl-back-link:hover {
+    background: #f1f5f9;
+  }
+</style>
 
-<% if @catraca %>
-  <h2>Catraca <%= @catraca.codigo_identificador %></h2>
-<% end %>
+<div class="hl-page">
+  <div class="hl-topbar">
+    <div class="hl-brand">
+      <span class="hl-brand-badge">RU UnB</span>
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-weight: 700; color: #0f3d7a; font-size: 0.92rem;">Controle de Catracas</span>
+          <span class="hl-op-pill">Operacional</span>
+        </div>
+        <div style="font-size: 0.78rem; color: #64748b;">Histórico Local de Acessos</div>
+      </div>
+    </div>
+    <div style="font-size: 0.82rem; color: #475569;">
+      <%= @catraca&.restaurante&.nome || "Terminal Local" %>
+    </div>
+  </div>
 
-<% if @mensagem %>
-  <p><%= @mensagem %></p>
-<% end %>
+  <div class="hl-breadcrumb">
+    Controle de Catracas &rsaquo; <strong>Histórico local da catraca</strong>
+  </div>
 
-<% if @acessos.present? %>
-  <table>
-    <thead>
-      <tr>
-        <th>Data e hora</th>
-        <th>Matrícula</th>
-        <th>Resultado</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @acessos.each do |acesso| %>
-        <tr>
-          <td><%= l(acesso.data_hora, format: "%d/%m/%Y %H:%M") %></td>
-          <td><%= acesso.usuario.matricula %></td>
-          <td>
-            <%= acesso.autorizado ? "Autorizado" : "Recusado" %>
-            <%= "(#{acesso.motivo_recusa})" if acesso.motivo_recusa.present? %>
-          </td>
-        </tr>
+  <div class="hl-header-card">
+    <div>
+      <h1>Histórico local da catraca</h1>
+      <% if @catraca %>
+        <h2>Catraca <%= @catraca.codigo_identificador %></h2>
       <% end %>
-    </tbody>
-  </table>
-<% end %>
+    </div>
 
-<%= link_to "Voltar", root_path %>
+    <% if @catraca %>
+      <div class="hl-meta-pills">
+        <span class="hl-meta-pill">Unidade: <strong><%= @catraca.restaurante&.nome || "Não vinculada" %></strong></span>
+        <span class="hl-meta-pill">Posto: <strong><%= @catraca.codigo_identificador %></strong></span>
+        <span class="hl-meta-pill active">Status: <%= @catraca.status %></span>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="hl-filter-card">
+    <%= form_with url: historico_local_path, method: :get, class: "hl-filter-form" do |f| %>
+      <%= f.label :catraca_id, "Catraca" %>
+      <%= f.select :catraca_id,
+            @catracas.map { |c| ["#{c.codigo_identificador} - #{c.restaurante&.nome}", c.id] },
+            { include_blank: "Selecione", selected: @catraca&.id } %>
+      <%= f.submit "Selecionar catraca", class: "hl-btn-primary" %>
+    <% end %>
+
+    <% if @catraca %>
+      <div style="font-size: 0.82rem; color: #64748b;">
+        Exibindo <%= acessos_lista.size %> <%= acessos_lista.size == 1 ? "acesso" : "acessos" %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @catraca %>
+    <div class="hl-kpis">
+      <div class="hl-kpi-card">
+        <div class="hl-kpi-label">Acessos autorizados</div>
+        <div class="hl-kpi-value green"><%= total_autorizados %></div>
+      </div>
+      <div class="hl-kpi-card">
+        <div class="hl-kpi-label">Acessos recusados</div>
+        <div class="hl-kpi-value red"><%= total_recusados %></div>
+      </div>
+      <div class="hl-kpi-card">
+        <div class="hl-kpi-label">Total debitado</div>
+        <div class="hl-kpi-value">R$ <%= format("%.2f", total_debitado_centavos / 100.0).tr(".", ",") %></div>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @mensagem %>
+    <p class="hl-message"><%= @mensagem %></p>
+  <% end %>
+
+  <% if @acessos.present? %>
+    <div class="hl-table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Data e hora</th>
+            <th>Matrícula</th>
+            <th>Forma de acesso</th>
+            <th>Resultado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @acessos.each do |acesso| %>
+            <tr class="<%= "hl-row-denied" unless acesso.autorizado %>">
+              <td style="font-weight: 600; color: #0f3d7a;"><%= l(acesso.data_hora, format: "%d/%m/%Y %H:%M") %></td>
+              <td style="font-weight: 600;"><%= acesso.usuario.matricula %></td>
+              <td><%= acesso.forma_acesso %></td>
+              <td>
+                <% resultado_texto = +"#{acesso.autorizado ? "Autorizado" : "Recusado"}" %>
+                <% resultado_texto << " (#{acesso.motivo_recusa})" if acesso.motivo_recusa.present? %>
+                <span class="<%= acesso.autorizado ? "hl-badge-ok" : "hl-badge-denied" %>">
+                  <%= resultado_texto %>
+                </span>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <%= link_to "Voltar", root_path, class: "hl-back-link" %>
+</div>

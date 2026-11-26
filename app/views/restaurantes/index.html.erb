@@ -1,43 +1,391 @@
-<h1>Gestão de restaurantes e catracas</h1>
+<% total_catracas = @restaurantes.sum { |r| r.catracas.size } %>
+<% catracas_ativas = @restaurantes.sum { |r| r.catracas.count { |c| c.status == "ativa" } } %>
 
-<% if flash[:notice] %><p class="notice"><%= flash[:notice] %></p><% end %>
-<% if flash[:alert] %><p class="alert"><%= flash[:alert] %></p><% end %>
+<style>
+  .ru-page {
+    max-width: 1120px;
+    margin: 24px auto 48px;
+    padding: 0 20px;
+  }
+  .ru-topbar {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+  .ru-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .ru-brand-badge {
+    background: #0f3d7a;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 8px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.04em;
+  }
+  .ru-brand-sub {
+    font-size: 0.78rem;
+    color: #64748b;
+  }
+  .ru-pill {
+    display: inline-block;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 6px;
+  }
+  .ru-page h1 {
+    margin: 0 0 20px 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #0f3d7a;
+  }
+  .ru-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .ru-kpi-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+  .ru-kpi-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin-bottom: 6px;
+  }
+  .ru-kpi-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f3d7a;
+  }
+  .ru-kpi-value.green {
+    color: #15803d;
+  }
+  .ru-forms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  .ru-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+  .ru-card h2 {
+    margin: 0 0 16px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .ru-field {
+    margin-bottom: 14px;
+  }
+  .ru-field label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+  }
+  .ru-field input[type="text"],
+  .ru-field select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    font-size: 0.92rem;
+    color: #0f172a;
+    background: #ffffff;
+  }
+  .ru-field input[type="text"]:focus,
+  .ru-field select:focus {
+    outline: none;
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+  }
+  .ru-btn-primary {
+    background: #0f3d7a;
+    color: #ffffff;
+    border: none;
+    border-radius: 7px;
+    padding: 9px 16px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .ru-btn-primary:hover {
+    background: #1e40af;
+  }
+  .ru-section-title {
+    margin: 0 0 16px 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .ru-unit-section {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+  .ru-unit-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .ru-unit-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .ru-unit-section h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f3d7a;
+  }
+  .ru-campus-badge {
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .ru-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .ru-actions form {
+    display: inline;
+    margin: 0;
+  }
+  .ru-link-edit {
+    display: inline-block;
+    padding: 6px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    color: #1e293b;
+    text-decoration: none;
+    font-size: 0.84rem;
+    font-weight: 600;
+    background: #f8fafc;
+  }
+  .ru-link-edit:hover {
+    background: #f1f5f9;
+  }
+  .ru-btn-danger {
+    padding: 6px 12px;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    color: #b91c1c;
+    background: #fef2f2;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .ru-btn-danger:hover {
+    background: #fee2e2;
+  }
+  .ru-catracas-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .ru-catraca-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .ru-catraca-info {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  .ru-catraca-status {
+    color: #15803d;
+    font-weight: 600;
+    font-size: 0.84rem;
+  }
+  .ru-catraca-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ru-catraca-actions form {
+    display: inline;
+    margin: 0;
+  }
+  .ru-sm-link {
+    font-size: 0.8rem;
+    color: #0f3d7a;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 5px;
+    background: #eff6ff;
+  }
+  .ru-sm-btn-danger {
+    font-size: 0.8rem;
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 5px;
+    padding: 4px 8px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+</style>
 
-<h2>Novo restaurante</h2>
-<%= form_with model: @restaurante, url: restaurantes_path do |f| %>
-  <%= render "restaurantes/erros", registro: @restaurante %>
-  <%= f.label :nome, "Nome do restaurante" %>
-  <%= f.text_field :nome %>
-  <%= f.label :campus, "Campus" %>
-  <%= f.text_field :campus %>
-  <%= f.submit "Salvar restaurante" %>
-<% end %>
+<div class="ru-page">
+  <div class="ru-topbar">
+    <div class="ru-brand">
+      <span class="ru-brand-badge">RU UnB</span>
+      <div>
+        <div style="font-weight: 700; color: #0f3d7a; font-size: 0.95rem;">Administração Geral</div>
+        <div class="ru-brand-sub">Operações &amp; Configuração</div>
+      </div>
+    </div>
+    <div class="ru-brand-sub">Gestão de Restaurantes e Catracas</div>
+  </div>
 
-<h2>Nova catraca</h2>
-<%= form_with model: @catraca, url: catracas_path do |f| %>
-  <%= render "restaurantes/erros", registro: @catraca %>
-  <%= f.label :codigo_identificador, "Identificador da catraca" %>
-  <%= f.text_field :codigo_identificador %>
-  <%= f.label :restaurante_id, "Restaurante" %>
-  <%= f.collection_select :restaurante_id, @restaurantes, :id, :nome, include_blank: "Selecione" %>
-  <%= f.submit "Salvar catraca" %>
-<% end %>
+  <% if flash[:notice] %>
+    <p class="notice"><%= flash[:notice] %></p>
+  <% end %>
+  <% if flash[:alert] %>
+    <p class="alert"><%= flash[:alert] %></p>
+  <% end %>
 
-<h2>Restaurantes cadastrados</h2>
-<% @restaurantes.each do |restaurante| %>
-  <section id="restaurante_<%= restaurante.id %>">
-    <h3><%= restaurante.nome %></h3>
-    <%= link_to "Editar", edit_restaurante_path(restaurante) %>
-    <%= button_to "Remover", restaurante_path(restaurante), method: :delete %>
+  <span class="ru-pill">Módulo de Administração</span>
+  <h1>Gestão de restaurantes e catracas</h1>
 
-    <ul>
-      <% restaurante.catracas.each do |catraca| %>
-        <li>
-          <%= catraca.codigo_identificador %> (<%= catraca.status %>)
-          <%= link_to "Editar", edit_catraca_path(catraca) %>
-          <%= button_to "Remover", catraca_path(catraca), method: :delete %>
-        </li>
+  <div class="ru-kpis">
+    <div class="ru-kpi-card">
+      <div class="ru-kpi-label">Restaurantes cadastrados</div>
+      <div class="ru-kpi-value"><%= @restaurantes.size %></div>
+    </div>
+    <div class="ru-kpi-card">
+      <div class="ru-kpi-label">Catracas cadastradas</div>
+      <div class="ru-kpi-value green"><%= total_catracas %></div>
+    </div>
+    <div class="ru-kpi-card">
+      <div class="ru-kpi-label">Catracas ativas</div>
+      <div class="ru-kpi-value"><%= catracas_ativas %></div>
+    </div>
+  </div>
+
+  <div class="ru-forms-grid">
+    <div class="ru-card">
+      <h2>Novo restaurante</h2>
+      <%= form_with model: @restaurante, url: restaurantes_path do |f| %>
+        <%= render "restaurantes/erros", registro: @restaurante %>
+        <div class="ru-field">
+          <%= f.label :nome, "Nome do restaurante" %>
+          <%= f.text_field :nome %>
+        </div>
+        <div class="ru-field">
+          <%= f.label :campus, "Campus" %>
+          <%= f.text_field :campus %>
+        </div>
+        <%= f.submit "Salvar restaurante", class: "ru-btn-primary" %>
       <% end %>
-    </ul>
-  </section>
-<% end %>
+    </div>
+
+    <div class="ru-card">
+      <h2>Nova catraca</h2>
+      <%= form_with model: @catraca, url: catracas_path do |f| %>
+        <%= render "restaurantes/erros", registro: @catraca %>
+        <div class="ru-field">
+          <%= f.label :codigo_identificador, "Identificador da catraca" %>
+          <%= f.text_field :codigo_identificador %>
+        </div>
+        <div class="ru-field">
+          <%= f.label :restaurante_id, "Restaurante" %>
+          <%= f.collection_select :restaurante_id, @restaurantes, :id, :nome, include_blank: "Selecione" %>
+        </div>
+        <%= f.submit "Salvar catraca", class: "ru-btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+
+  <h2 class="ru-section-title">Restaurantes cadastrados</h2>
+  <% @restaurantes.each do |restaurante| %>
+    <section id="restaurante_<%= restaurante.id %>" class="ru-unit-section">
+      <div class="ru-unit-header">
+        <div class="ru-unit-title-wrap">
+          <h3><%= restaurante.nome %></h3>
+          <% if restaurante.respond_to?(:campus) && restaurante.campus.present? %>
+            <span class="ru-campus-badge"><%= restaurante.campus %></span>
+          <% end %>
+        </div>
+        <div class="ru-actions">
+          <%= link_to "Editar", edit_restaurante_path(restaurante), class: "ru-link-edit" %>
+          <%= button_to "Remover", restaurante_path(restaurante), method: :delete, class: "ru-btn-danger" %>
+        </div>
+      </div>
+
+      <ul class="ru-catracas-list">
+        <% restaurante.catracas.each do |catraca| %>
+          <li class="ru-catraca-item">
+            <div>
+              <div class="ru-catraca-info"><%= catraca.codigo_identificador %></div>
+              <div class="ru-catraca-status">(<%= catraca.status %>)</div>
+            </div>
+            <div class="ru-catraca-actions">
+              <%= link_to "Editar", edit_catraca_path(catraca), class: "ru-sm-link" %>
+              <%= button_to "Remover", catraca_path(catraca), method: :delete, class: "ru-sm-btn-danger" %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+</div>
