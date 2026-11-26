@@ -71,6 +71,25 @@ RSpec.describe "Recargas", type: :request do
         expect(response).to have_http_status(:success)
         expect(response.body).to include("22,50")
       end
+
+      it "cria carteira com saldo zero automaticamente quando o estudante ainda não possui carteira" do
+        estudante_sem_carteira = Usuario.create!(
+          matricula: "221045666",
+          nome: "Novo Estudante",
+          email: "novo_estudante@unb.br",
+          password: "password123",
+          papel: "estudante",
+          ativo: true
+        )
+        post "/dev_login", params: { usuario_id: estudante_sem_carteira.id }
+
+        expect {
+          get "/recargas/new"
+        }.to change(Carteira, :count).by(1)
+
+        expect(response).to have_http_status(:success)
+        expect(estudante_sem_carteira.reload.carteira.saldo_centavos).to eq(0)
+      end
     end
 
     describe "POST /recargas" do

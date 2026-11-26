@@ -221,5 +221,17 @@ RSpec.describe ExtratoService, type: :service do
       expect(service.send(:formatar_restaurante, nil)).to eq("Darcy Ribeiro")
       expect(service.send(:formatar_restaurante, restaurante_sem_campus)).to eq("Planaltina")
     end
+
+    it "aplica fallbacks padrão quando acesso não possui turno, catraca ou valor preenchidos" do
+      service = described_class.new(usuario)
+      acesso_incompleto = Acesso.new(id: 999, created_at: Time.current)
+
+      lancamento = service.send(:montar_lancamento_acesso, acesso_incompleto)
+
+      expect(lancamento.evento).to eq("Refeição")
+      expect(lancamento.restaurante).to eq("Darcy Ribeiro")
+      expect(lancamento.forma_acesso).to eq("QR Code App")
+      expect(lancamento.valor_centavos).to eq(450)
+    end
   end
 end
