@@ -1,3 +1,5 @@
+# Modelo que representa uma catraca de acesso vinculada a um restaurante,
+# controlando seu status padrão e validando vínculo e unicidade do código.
 class Catraca < ApplicationRecord
   belongs_to :restaurante, optional: true
   has_many :acessos, dependent: :destroy
@@ -9,6 +11,19 @@ class Catraca < ApplicationRecord
 
   private
 
+  # :doc:
+  # Valida se há um restaurante associado e se o +codigo_identificador+ está
+  # preenchido e não é duplicado entre outras catracas.
+  #
+  # Argumentos::
+  #   Nenhum.
+  # Retorno::
+  #   O resultado da última expressão avaliada no bloco condicional
+  #   (verdadeiro, falso ou +nil+).
+  # Efeitos colaterais::
+  #   Consulta a tabela de catracas no banco para checar duplicidade de
+  #   +codigo_identificador+ e adiciona mensagens em +errors[:base]+ quando
+  #   alguma validação falha.
   def validar_restaurante_e_identificador
     errors.add(:base, "Selecione um restaurante") if restaurante.blank?
 
