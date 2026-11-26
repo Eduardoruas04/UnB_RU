@@ -57,6 +57,26 @@ RSpec.describe "Extratos", type: :request do
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Extrato e Histórico de Refeições")
       end
+
+      it "aplica filtros de período, tipo de refeição e forma de acesso" do
+        usuario.acessos.create!(
+          catraca: catraca,
+          turno: turno,
+          valor_pago_centavos: 450,
+          autorizado: true,
+          forma_acesso: "QR Code App",
+          data_hora: Time.current
+        )
+
+        get "/extrato", params: {
+          periodo: "Últimos 30 dias",
+          tipo_refeicao: "Almoço",
+          forma_acesso: "QR Code App"
+        }
+
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include("Almoço")
+      end
     end
 
     context "quando o usuário não está autenticado" do
@@ -99,6 +119,27 @@ RSpec.describe "Extratos", type: :request do
           expect(response.headers["Content-Disposition"]).to include("attachment")
           expect(response.headers["Content-Disposition"]).to include("extrato_refeicoes_#{usuario.matricula}.pdf")
           expect(response.body).to start_with("%PDF-")
+        end
+
+        it "redireciona com alerta quando o serviço de PDF está indisponível (Sad Path)" do
+          begin
+            $pdf_service_indisponivel = true
+            get "/extrato/exportar_pdf"
+          ensure
+            $pdf_service_indisponivel = false
+          end
+
+          expect(response).to redirect_to(extrato_path)
+          expect(flash[:alert]).to eq("Não foi possível gerar o PDF. Tente novamente")
+        end
+
+        it "redireciona com alerta quando ocorre exceção na geração do PDF (Sad Path)" do
+          allow_any_instance_of(ExtratoPdfGenerator).to receive(:gerar).and_raise(StandardError, "Falha interna")
+
+          get "/extrato/exportar_pdf"
+
+          expect(response).to redirect_to(extrato_path)
+          expect(flash[:alert]).to eq("Não foi possível gerar o PDF. Tente novamente")
         end
       end
 
