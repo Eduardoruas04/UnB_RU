@@ -31,20 +31,24 @@ Carteira.find_or_create_by!(usuario: aluno_sem_saldo) do |c|
   c.saldo_centavos = 0
 end
 
-funcionario = Usuario.find_or_create_by!(matricula: "FUNC01") do |u|
+# FUNC01 e ADMIN01 não seguem a matrícula de 9 dígitos exigida no cadastro
+# de estudantes. São contas de exemplo, então são gravadas sem validação.
+funcionario = Usuario.find_or_initialize_by(matricula: "FUNC01").tap do |u|
   u.nome = "Operador de Catraca"
   u.email = "operador@unb.br"
   u.password = "senha123"
   u.papel = "funcionario"
   u.ativo = true
+  u.save!(validate: false) if u.new_record?
 end
 
-admin = Usuario.find_or_create_by!(matricula: "ADMIN01") do |u|
+admin = Usuario.find_or_initialize_by(matricula: "ADMIN01").tap do |u|
   u.nome = "Administrador RU"
   u.email = "admin@unb.br"
   u.password = "senha123"
   u.papel = "administrador"
   u.ativo = true
+  u.save!(validate: false) if u.new_record?
 end
 
 # 2. Restaurantes e Catracas
