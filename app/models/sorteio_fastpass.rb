@@ -1,3 +1,4 @@
+# Representa o sorteio FastPass de um turno e suas inscrições.
 class SorteioFastpass < ApplicationRecord
   belongs_to :turno
   has_many :inscricoes_fastpass, dependent: :destroy
@@ -5,7 +6,11 @@ class SorteioFastpass < ApplicationRecord
 
   validates :data_sorteio, :status, :vagas_disponiveis, presence: true
   validates :vagas_disponiveis, numericality: { greater_than_or_equal_to: 0 }
-  # A data do sorteio representa o dia do turno ao qual o resultado se refere.
+
+  # [Descrição] Combina a data do sorteio com a hora de início do turno no fuso de Brasília.
+  # [Argumentos] Nenhum.
+  # [Retorno] Um ActiveSupport::TimeWithZone com o início do turno na data sorteada.
+  # [Efeitos colaterais] Usa temporariamente o fuso America/Sao_Paulo e restaura o fuso anterior.
   def horario_fastpass
     horario = turno.horario_inicio.utc
     Time.use_zone("America/Sao_Paulo") do
@@ -14,6 +19,10 @@ class SorteioFastpass < ApplicationRecord
     end
   end
 
+  # [Descrição] Calcula o momento do aviso uma hora antes do início do turno.
+  # [Argumentos] Nenhum.
+  # [Retorno] Um ActiveSupport::TimeWithZone, que pode cair no dia anterior ao sorteio.
+  # [Efeitos colaterais] Nenhuma alteração persistente.
   def horario_notificacao
     horario_fastpass - 1.hour
   end

@@ -1,3 +1,4 @@
+# Representa a conta de um usuário e seus vínculos com os serviços do restaurante.
 class Usuario < ApplicationRecord
   has_secure_password
 

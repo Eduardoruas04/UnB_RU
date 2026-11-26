@@ -36,4 +36,6 @@
 # Relatorios de cobertura e documentacao gerados localmente (Sprint 3)
 /coverage/
 /doc/
+/tmp/rubycritic/
+/vendor/bundle/
 

@@ -1,3 +1,4 @@
+# Mantém o saldo em centavos associado a um usuário.
 class Carteira < ApplicationRecord
   belongs_to :usuario
   has_many :recargas, dependent: :destroy

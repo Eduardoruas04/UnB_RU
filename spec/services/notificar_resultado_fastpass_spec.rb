@@ -44,6 +44,20 @@ RSpec.describe NotificarResultadoFastpass do
     expect { described_class.call(agora: agora) }.not_to change(Notificacao, :count)
   end
 
+  it "confere novamente o status se o sorteio for cancelado durante o processamento" do
+    instante = agora
+    sorteios = SorteioFastpass.where(id: sorteio.id)
+    allow(SorteioFastpass).to receive(:where)
+      .with(status: "realizado", data_sorteio: instante.to_date..(instante.to_date + 1))
+      .and_return(sorteios)
+    allow(sorteios).to receive(:find_each) do |&processar|
+      sorteios.update_all(status: "cancelado")
+      processar.call(sorteio)
+    end
+
+    expect { described_class.call(agora: instante) }.not_to change(Notificacao, :count)
+  end
+
   it "não envia sem resultado individual" do
     inscricao.update!(status: "pendente")
     expect { described_class.call(agora: agora) }.not_to change(Notificacao, :count)
