@@ -10,9 +10,9 @@ module ControleDeAcesso
 
   # Verifica se há um usuário autenticado com papel de administrador.
   #
-  # Argumentos::
+  # Argumentos:
   #   Nenhum (utiliza os helpers +logged_in?+ e +current_user+ do controller).
-  # Retorno::
+  # Retorno:::
   #   +nil+ quando o acesso é permitido; caso contrário, retorna o resultado
   #   do redirecionamento HTTP.
   # Efeitos colaterais::
