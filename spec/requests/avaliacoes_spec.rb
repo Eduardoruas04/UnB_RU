@@ -90,7 +90,7 @@ RSpec.describe "Avaliações", type: :request do
           }
         }.not_to change(Avaliacao, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include(
           "Você precisa ter consumido uma refeição hoje para avaliar"
         )
@@ -105,7 +105,7 @@ RSpec.describe "Avaliações", type: :request do
           }
         }.not_to change(Avaliacao, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include(
           "Selecione uma nota para a refeição"
         )
@@ -120,7 +120,7 @@ RSpec.describe "Avaliações", type: :request do
           }
         }.not_to change(Avaliacao, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 
@@ -138,7 +138,7 @@ RSpec.describe "Avaliações", type: :request do
           }
         }.not_to change(Avaliacao, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
